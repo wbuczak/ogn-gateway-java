@@ -21,7 +21,7 @@ public class PluginsManagerTest {
         PluginsManager pluginsManager = new PluginsManager();
 
         conf = EasyMock.createMock(Configuration.class);
-        expect(conf.getPluginsFolderName()).andReturn("plugins");
+        expect(conf.getPluginsFolderName()).andReturn("src/test/resources/plugins");
         expectLastCall().atLeastOnce();
 
         expect(conf.getScanningInterval()).andReturn(500);
