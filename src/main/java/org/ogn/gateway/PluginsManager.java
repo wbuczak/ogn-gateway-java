@@ -101,14 +101,15 @@ public class PluginsManager {
         URLClassLoader ucl = new URLClassLoader(urls);
 
         ServiceLoader<OgnBeaconForwarder> sl = ServiceLoader.load(OgnBeaconForwarder.class, ucl);
+
         Iterator<OgnBeaconForwarder> apit = sl.iterator();
 
         while (apit.hasNext()) {
             OgnBeaconForwarder bf = apit.next();
             String key = pluginKey(bf.getName(), bf.getVersion());
 
-            // TODO: this md5 key is not the best. We should register the newest (higher) version
-            // of a plugin if two same plugins are available (with same name)
+            // TODO: Should we register the newest (higher) version of a plugin if two same
+            // plugins are available (with same name)
             String md5key = StringUtils.md5(key);
 
             // if not yet registered

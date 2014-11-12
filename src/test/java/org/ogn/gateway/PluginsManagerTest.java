@@ -9,6 +9,10 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.easymock.EasyMock;
 import org.junit.Test;
 
@@ -48,6 +52,5 @@ public class PluginsManagerTest {
         assertEquals(1, pluginsManager.getRegisteredPluginsCount());
 
         pluginsManager.stop();
-    }
-
+    }  
 }
