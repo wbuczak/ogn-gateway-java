@@ -7,22 +7,23 @@ package org.ogn.gateway;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.ogn.client.OgnBeaconListener;
+import org.ogn.client.AircraftBeaconListener;
 import org.ogn.client.OgnClient;
 import org.ogn.commons.beacon.AddressType;
 import org.ogn.commons.beacon.AircraftBeacon;
+import org.ogn.commons.beacon.AircraftDescriptor;
 import org.ogn.commons.igc.IgcLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * The <code>OgnGatewayProxy</code> service subscribes to the OGN AircraftBeacons (through ogn-client) and registers
- * plugins manager as a listener of the AircraftBeacons
+ * The <code>OgnGatewayProxy</code> service subscribes to the OGN AircraftBeacons (through ogn-client-java) and
+ * registers plug-ins manager as a listener of the AircraftBeacons. I also logs all received using IgcLogger
  * 
  * @author wbuczak
  */
 @Service
-public class OgnGatewayProxy implements OgnBeaconListener<AircraftBeacon> {
+public class OgnGatewayProxy implements AircraftBeaconListener {
 
     @Autowired
     private PluginsManager pluginsManager;
@@ -31,8 +32,8 @@ public class OgnGatewayProxy implements OgnBeaconListener<AircraftBeacon> {
     private OgnClient client;
 
     @Autowired
-    IgcLogger igcWriter;
-    
+    IgcLogger igcLogger;
+
     @Autowired
     Configuration conf;
 
@@ -48,22 +49,21 @@ public class OgnGatewayProxy implements OgnBeaconListener<AircraftBeacon> {
     }
 
     @Override
-    public void onUpdate(AircraftBeacon beacon) {
-        // Log position in IGC file
-        // IGCWriter.logPosition(getRegNum(immat),currentFix.latitude,currentFix.longitude,currentFix.altitude,line);
-        // IGCWriter.logPosition(getRegNum(immat+"."+currentFix.Id+"."+currentFix.regnum+"."+currentFix.CN),currentFix.latitude,currentFix.longitude,currentFix.altitude,line);
+    public void onUpdate(AircraftBeacon beacon, AircraftDescriptor descriptor) {
 
-        igcWriter.log(beacon);
+        String id = descriptor == null ? beacon.getId() : descriptor.getRegNumber();
 
-        // notify forwarders only when certain condition is met
-        if (beacon.getId() != null && !beacon.isStealth() && !beacon.getAddressType().equals(AddressType.RANDOM)
+        // log to IGC file (non blocking operation)
+        igcLogger.log(id, beacon.getLat(), beacon.getLon(), beacon.getAlt(), beacon.getRawPacket());
+
+        // notify forwarders if certain condition is met
+        if (!beacon.isStealth() && !beacon.getAddressType().equals(AddressType.RANDOM)
                 && beacon.getErrorCount() < conf.getMaxPacketErrors()) {
 
             for (PluginHandler ph : pluginsManager.getRegisteredPlugins()) {
-                ph.onUpdate(beacon);
+                ph.onUpdate(beacon, descriptor);
             }// for
+        }// if
 
-        }
-
-    }// if
+    }
 }

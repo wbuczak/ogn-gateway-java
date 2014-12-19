@@ -27,6 +27,7 @@
 		</bean>
 
 
+		<!-- IGC logger works by default in a non-blocking (async) mode -->
 		<bean id="igcLogger" class="org.ogn.commons.igc.IgcLogger" />
 
 		<!-- enable spring annotations scanning -->

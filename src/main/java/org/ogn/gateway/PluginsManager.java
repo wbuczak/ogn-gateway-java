@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.ogn.commons.beacon.forwarder.OgnBeaconForwarder;
+import org.ogn.commons.beacon.forwarder.OgnAircraftBeaconForwarder;
 import org.ogn.commons.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * this service takes care of periodic scanning and registration of gateway plugins
+ * this service takes care of periodic scanning and registration of gateway plug-ins
  * 
  * @author wbuczak
  */
@@ -38,6 +38,8 @@ import org.springframework.stereotype.Service;
 public class PluginsManager {
 
     static Logger LOG = LoggerFactory.getLogger(PluginsManager.class);
+
+    static Logger LOG_MANAGER = LoggerFactory.getLogger("PluginsManager");
 
     Configuration conf;
 
@@ -95,25 +97,31 @@ public class PluginsManager {
             try {
                 urls[i] = flist[i].toURI().toURL();
             } catch (MalformedURLException e) {
-                LOG.error("failed to register plugin", e);
+                LOG.error("failed to register plug-in", e);
             }
 
         URLClassLoader ucl = new URLClassLoader(urls);
 
-        ServiceLoader<OgnBeaconForwarder> sl = ServiceLoader.load(OgnBeaconForwarder.class, ucl);
+        ServiceLoader<OgnAircraftBeaconForwarder> sl = ServiceLoader.load(OgnAircraftBeaconForwarder.class, ucl);
 
-        Iterator<OgnBeaconForwarder> apit = sl.iterator();
+        Iterator<OgnAircraftBeaconForwarder> it = sl.iterator();
 
-        while (apit.hasNext()) {
-            OgnBeaconForwarder bf = apit.next();
+        while (it.hasNext()) {
+            OgnAircraftBeaconForwarder bf = it.next();
+
+            LOG.debug("loading plug-in: {}", bf.getClass().getName());
+
             String key = pluginKey(bf.getName(), bf.getVersion());
 
-            // TODO: Should we register the newest (higher) version of a plugin if two same
-            // plugins are available (with same name)
+            // TODO: Should we register the newest (higher) version of a plug-in if two same
+            // plug-ins are available (with same name) ?
             String md5key = StringUtils.md5(key);
 
             // if not yet registered
             if (!plugins.containsKey(md5key)) {
+                LOG_MANAGER.info("registering plug-in {} {} {} {}", bf.getClass().getName(), bf.getName(),
+                        bf.getVersion(), bf.getDescription());
+
                 PluginHandler ph = new PluginHandler(bf);
                 ph.start();
                 plugins.putIfAbsent(StringUtils.md5(key), ph);
