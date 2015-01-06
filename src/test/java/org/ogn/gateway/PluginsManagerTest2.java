@@ -38,7 +38,7 @@ public class PluginsManagerTest2 {
         Files.createDirectory(dir);
     }
 
-    @Test(timeout = 4000)
+    @Test(timeout = 5000)
     public void test2() throws Exception {
 
         PluginsManager pluginsManager = new PluginsManager();
