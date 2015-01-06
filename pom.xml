@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.ogn</groupId>
 	<artifactId>ogn-gateway-java</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<description>The OGN gateway forwards OGN aircraft beacons to different systems (e.g. cunimb.fr, FR24) All specific forwarders are implemented as plugins, automatically detected and registered (once put in a plugins folder)</description>
 
 	<properties>
