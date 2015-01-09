@@ -39,8 +39,6 @@ public class PluginsManager {
 
     static Logger LOG = LoggerFactory.getLogger(PluginsManager.class);
 
-    static Logger LOG_MANAGER = LoggerFactory.getLogger("PluginsManager");
-
     Configuration conf;
 
     private ConcurrentMap<String, PluginHandler> plugins = new ConcurrentHashMap<>();
@@ -119,8 +117,8 @@ public class PluginsManager {
 
             // if not yet registered
             if (!plugins.containsKey(md5key)) {
-                LOG_MANAGER.info("registering plug-in {} {} {} {}", bf.getClass().getName(), bf.getName(),
-                        bf.getVersion(), bf.getDescription());
+                LOG.info("registering plug-in {} {} {} {}", bf.getClass().getName(), bf.getName(), bf.getVersion(),
+                        bf.getDescription());
 
                 PluginHandler ph = new PluginHandler(bf);
                 ph.start();
