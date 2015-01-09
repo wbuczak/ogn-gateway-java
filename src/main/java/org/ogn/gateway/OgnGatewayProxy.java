@@ -12,7 +12,11 @@ import org.ogn.client.OgnClient;
 import org.ogn.commons.beacon.AddressType;
 import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftDescriptor;
+import org.ogn.commons.beacon.forwarder.OgnBeaconForwarder;
 import org.ogn.commons.igc.IgcLogger;
+import org.ogn.commons.utils.JsonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +40,8 @@ public class OgnGatewayProxy implements AircraftBeaconListener {
 
     @Autowired
     Configuration conf;
+
+    static Logger LOG = LoggerFactory.getLogger("OgnGatewayProxy");
 
     @PostConstruct
     public void init() {
@@ -61,7 +67,13 @@ public class OgnGatewayProxy implements AircraftBeaconListener {
                 && beacon.getErrorCount() < conf.getMaxPacketErrors()) {
 
             for (PluginHandler ph : pluginsManager.getRegisteredPlugins()) {
-                ph.onUpdate(beacon, descriptor);
+                OgnBeaconForwarder p = ph.getPlugin();
+                
+                LOG.info("{} {} {} {}", p.getName(), p.getVersion(), JsonUtils.toJson(beacon),
+                        JsonUtils.toJson(descriptor));
+                
+                if (!conf.isSimulationModeOn())
+                    ph.onUpdate(beacon, descriptor);
             }// for
         }// if
 

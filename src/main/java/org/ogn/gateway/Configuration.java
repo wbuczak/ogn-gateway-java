@@ -15,27 +15,42 @@ public class Configuration {
 
     @Value("${ogn.gateway.plugins.folder:plugins}")
     private String pluginsFolder;
-    
-    @Value("#{${ogn.gateway.plugins.scanning_interval:30000}}")    
+
+    @Value("${ogn.gateway.igc.folder:igc}")
+    private String igcFolder;
+
+    @Value("#{${ogn.gateway.plugins.scanning_interval:30000}}")
     private int scanningIntervalMs;
-    
+
     @Value("${ogn.gateway.max_packet_errors:5}")
     private int maxPacketErrors;
 
+    @Value("${ogn.gateway.simulation:false}")
+    private boolean simulationMode;
 
     @ManagedAttribute
     public String getPluginsFolderName() {
         return pluginsFolder;
     }
-    
+
     @ManagedAttribute
     public int getScanningInterval() {
         return scanningIntervalMs;
     }
-    
+
     @ManagedAttribute
     public int getMaxPacketErrors() {
         return maxPacketErrors;
     }
-    
+
+    @ManagedAttribute
+    public boolean isSimulationModeOn() {
+        return simulationMode;
+    }
+
+    @ManagedAttribute
+    public String getIgcFolder() {
+        return igcFolder;
+    }
+
 }

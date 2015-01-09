@@ -6,9 +6,13 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+
 	<context:mbean-export registration="ignoreExisting" />
 
-	<context:property-placeholder ignore-resource-not-found="true" ignore-unresolvable="true" />
+	<!-- IGC logger works by default in a non-blocking (async) mode -->
+	<bean id="igcLogger" class="org.ogn.commons.igc.IgcLogger">
+		<constructor-arg type="java.lang.String" value="#{configuration.igcFolder}" />
+	</bean>
 
 	<beans profile="PRO">
 
@@ -26,16 +30,11 @@
 			<constructor-arg value="org.ogn.client.OgnClient" />
 		</bean>
 
-
-		<!-- IGC logger works by default in a non-blocking (async) mode -->
-		<bean id="igcLogger" class="org.ogn.commons.igc.IgcLogger" />
+		<context:property-placeholder location="classpath:ogn-gateway-test.properties"
+			ignore-resource-not-found="true" ignore-unresolvable="true" />
 
 		<!-- enable spring annotations scanning -->
 		<context:component-scan base-package="org.ogn.gateway" />
-
-
-		<context:property-placeholder location="classpath:resources/test.properties"
-			ignore-resource-not-found="true" ignore-unresolvable="true" />
 
 	</beans>
 

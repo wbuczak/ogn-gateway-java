@@ -46,6 +46,10 @@ public class PluginHandler implements AircraftBeaconListener {
         }
     }
 
+    public OgnAircraftBeaconForwarder getPlugin() {
+        return this.plugin;
+    }
+
     @Override
     public void onUpdate(AircraftBeacon beacon, AircraftDescriptor descriptor) {
         beacons.offer(new AircraftBeaconWithDescriptor(beacon, descriptor));

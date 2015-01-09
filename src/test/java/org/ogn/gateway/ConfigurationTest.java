@@ -20,6 +20,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ActiveProfiles("TEST")
 public class ConfigurationTest {
 
+    // try to set simulation mode as sys. env. variable
+    static {
+        System.setProperty("ogn.gateway.simulation", "true");
+    }
+
     @Resource
     Configuration config;
 
@@ -28,6 +33,10 @@ public class ConfigurationTest {
         assertNotNull(config);
         assertEquals("plugins", config.getPluginsFolderName());
         assertEquals(30000, config.getScanningInterval());
+        assertEquals("testigc", config.getIgcFolder());
+        assertEquals(6, config.getMaxPacketErrors());
+
+        assertEquals(true, config.isSimulationModeOn());
 
     }
 }

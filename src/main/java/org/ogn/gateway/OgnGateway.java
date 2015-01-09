@@ -29,10 +29,13 @@ public class OgnGateway {
 
     public static void main(String[] args) {
         configureLogging();
-        LOG.info("starting alarm monitor process");
+        LOG.info("starting OGN gateway process");
         ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:application-context.xml");
         ctx.getEnvironment().setDefaultProfiles("PRO");
         // ctx.getEnvironment().setActiveProfiles("TEST");
         ctx.refresh();
+        
+        Configuration conf = ctx.getBean(Configuration.class);        
+        LOG.info("simulation mode: {}",conf.isSimulationModeOn());
     }
 }
