@@ -33,27 +33,34 @@
 			<outputDirectory>conf/</outputDirectory>
 			<fileMode>0444</fileMode>
 		</fileSet>
+
+		<!-- create empty log folder -->
 		<fileSet>
-			<includes>
-				<include>tmp/</include>
-			</includes>
-			<fileMode>0777</fileMode>
-			<directoryMode>0777</directoryMode>
+			<directory>./</directory>
+			<outputDirectory>/log</outputDirectory>
+			<excludes>
+				<exclude>*/**</exclude>
+			</excludes>
 		</fileSet>
+
+		<!-- create empty tmp folder -->
 		<fileSet>
-			<includes>
-				<include>log/</include>
-			</includes>
-			<fileMode>0777</fileMode>
-			<directoryMode>0777</directoryMode>
+			<directory>./</directory>
+			<outputDirectory>/tmp</outputDirectory>
+			<excludes>
+				<exclude>*/**</exclude>
+			</excludes>
 		</fileSet>
+
+		<!-- create empty plugins folder -->
 		<fileSet>
-			<includes>
-				<include>plugins/</include>
-			</includes>
-			<fileMode>0777</fileMode>
-			<directoryMode>0777</directoryMode>
+			<directory>./</directory>
+			<outputDirectory>/plugins</outputDirectory>
+			<excludes>
+				<exclude>*/**</exclude>
+			</excludes>
 		</fileSet>
+
 	</fileSets>
 
 	<files>
