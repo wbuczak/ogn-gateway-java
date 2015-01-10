@@ -107,7 +107,7 @@ public class PluginsManager {
         while (it.hasNext()) {
             OgnAircraftBeaconForwarder bf = it.next();
 
-            LOG.debug("loading plug-in: {}", bf.getClass().getName());
+            LOG.trace("loading plug-in: {}", bf.getClass().getName());
 
             String key = pluginKey(bf.getName(), bf.getVersion());
 

@@ -22,7 +22,7 @@ OGN_GATEWAY_PROPERTIES=${OGN_GATEWAY_CON_DIR}/ogn-gateway.properties
 OGN_GATEWAY_PROCSTATE_LOG_FILE=${OGN_GATEWAY_LOG_DIR}/${PROCESS_NAME}-procstate.log
 OGN_GATEWAY_LOG4J_CONF_FILE=file://${OGN_GATEWAY_CON_DIR}/log4j.xml
 
-OGN_GATEWAY_LOG4J_CONF_FILE=${OGN_GATEWAY_LOG_DIR}/${PROCESS_NAME}.out.log
+OGN_GATEWAY_OUT_LOG_FILE=${OGN_GATEWAY_LOG_DIR}/${PROCESS_NAME}.out.log
 
 OGN_GATEWAY_MAIN_CLASS=org.ogn.gateway.OgnGateway
 
@@ -98,7 +98,7 @@ really_start() {
          -Dprocess.log.path=${OGN_GATEWAY_LOG_DIR} \
          -Dogn.gateway.properties=${OGN_GATEWAY_PROPERTIES} \
          -classpath "${OGN_GATEWAY_LIB_DIR}/*" \
-         ${OGN_GATEWAY_MAIN_CLASS} >${OGN_GATEWAY_LOG4J_CONF_FILE} 2>&1 &
+         ${OGN_GATEWAY_MAIN_CLASS} >${OGN_GATEWAY_OUT_LOG_FILE} 2>&1 &
 
   echo -n "Starting ${PROCESS_NAME} process on host ${OGN_GATEWAY_SRV_HOST} ..."
 

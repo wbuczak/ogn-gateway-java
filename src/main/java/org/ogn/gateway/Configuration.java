@@ -19,7 +19,7 @@ public class Configuration {
     @Value("${ogn.gateway.igc.folder:igc}")
     private String igcFolder;
 
-    @Value("#{${ogn.gateway.plugins.scanning_interval:30000}}")
+    @Value("${ogn.gateway.plugins.scanning_interval:30000}")
     private int scanningIntervalMs;
 
     @Value("${ogn.gateway.max_packet_errors:5}")

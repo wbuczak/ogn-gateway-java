@@ -7,9 +7,8 @@
 	<description>The OGN gateway forwards OGN aircraft beacons to different systems (e.g. cunimb.fr, FR24) All specific forwarders are implemented as plugins, automatically detected and registered (once put in a plugins folder)</description>
 
 	<properties>
-		<org.springframework.version>3.2.8.RELEASE</org.springframework.version>
+		<org.springframework.version>4.1.4.RELEASE</org.springframework.version>
 	</properties>
-
 
 	<dependencies>
 		<dependency>
