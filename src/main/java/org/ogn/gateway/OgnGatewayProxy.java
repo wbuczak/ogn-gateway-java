@@ -9,16 +9,17 @@ import javax.annotation.PreDestroy;
 
 import org.ogn.client.AircraftBeaconListener;
 import org.ogn.client.OgnClient;
+import org.ogn.client.ReceiverBeaconListener;
 import org.ogn.commons.beacon.AddressType;
 import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftDescriptor;
+import org.ogn.commons.beacon.ReceiverBeacon;
 import org.ogn.commons.beacon.forwarder.OgnBeaconForwarder;
 import org.ogn.commons.igc.IgcLogger;
 import org.ogn.commons.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -28,8 +29,7 @@ import org.springframework.stereotype.Service;
  * @author wbuczak
  */
 @Service
-@Lazy
-public class OgnGatewayProxy implements AircraftBeaconListener {
+public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconListener {
 
     @Autowired
     private PluginsManager pluginsManager;
@@ -44,15 +44,18 @@ public class OgnGatewayProxy implements AircraftBeaconListener {
     Configuration conf;
 
     static Logger LOG = LoggerFactory.getLogger("OgnGatewayPluginsLog");
+    static Logger LOG_REC = LoggerFactory.getLogger("ReceiverBeaconsLog");
 
     @PostConstruct
     public void init() {
         client.subscribeToAircraftBeacons(this);
+        client.subscribeToReceiverBeacons(this);
     }
 
     @PreDestroy
     private void cleanUp() {
         client.unsubscribeFromAircraftBeacons(this);
+        client.unsubscribeFromReceiverBeacons(this);
         client.disconnect();
     }
 
@@ -84,5 +87,11 @@ public class OgnGatewayProxy implements AircraftBeaconListener {
             }// for
         }// if
 
+    }
+
+    @Override
+    public void onUpdate(ReceiverBeacon beacon) {
+        // just log it
+        LOG_REC.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
     }
 }

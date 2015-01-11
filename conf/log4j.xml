@@ -24,7 +24,7 @@
 			<appender-ref ref="ConsoleAppender" />
 		</errorHandler>
 		<param name="Append" value="true" />
-		<param name="File" value="${process.log.path}/ogn-gateway.log" />
+		<param name="File" value="${process.log.path}/gateway.log" />
 		<param name="MaxBackupIndex" value="2" />
 		<param name="MaxFileSize" value="10MB" />
 		<param name="BufferedIO" value="false" />
@@ -35,13 +35,30 @@
 
 	<appender name="OgnGatewayPluginsLogAppender" class="org.apache.log4j.RollingFileAppender">
 		<param name="Append" value="true" />
-		<param name="File" value="${process.log.path}/ogn-gateway-plugins.log" />
+		<param name="File" value="${process.log.path}/plugins.log" />
 		<param name="MaxFileSize" value="5MB" />
 		<param name="MaxBackupIndex" value="2" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
 		</layout>
 	</appender>
+
+	<appender name="AprsBeaconsFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${process.log.path}/aprs.log" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="AprsReceiverBeaconsFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${process.log.path}/receivers.log" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
+		</layout>
+	</appender>
+
 
 	<!-- Create a RollingFileAppender. Log messages are written to a file name "ogn-gateway.log" in the temp directory. The 
 		file size is limited to 10MB; once this size is reached the file is truncated and backed up and a new file is started. If 
@@ -62,9 +79,9 @@
 		</layout>
 	</appender>
 
-
+	<!-- all spring related output -->
 	<logger name="org.springframework" additivity="false">
-		<level value="info" />
+		<level value="warn" />
 		<appender-ref ref="FileAppender" />
 	</logger>
 
@@ -73,7 +90,17 @@
 		<appender-ref ref="OgnGatewayPluginsLogAppender" />
 	</logger>
 
+	<!-- log all stuff from aprs beacons -->
+	<logger name="org.ogn.commons.beacon.impl.aprs" additivity="false">
+		<level value="info" />
+		<appender-ref ref="AprsBeaconsFileAppender" />
+	</logger>
 
+	<!-- log all receiver beacons received -->
+	<logger name="ReceiverBeaconsLog" additivity="false">
+		<level value="info" />
+		<appender-ref ref="AprsReceiverBeaconsFileAppender" />
+	</logger>
 
 	<logger name="org.ogn" additivity="false">
 		<level value="info" />

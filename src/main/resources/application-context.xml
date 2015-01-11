@@ -18,7 +18,16 @@
 		<context:property-placeholder location="file:${ogn.gateway.properties}"
 			ignore-resource-not-found="true" ignore-unresolvable="true" />
 
-		<bean id="client" class="org.ogn.client.OgnClientFactory" factory-method="createClient" init-method="connect" />
+		<!-- OGN client with aircraft descriptor provider -->
+		<bean id="client" class="org.ogn.client.OgnClientFactory" factory-method="createClient" init-method="connect">
+			<constructor-arg>
+				<list>
+					<!-- flarmNet aircraft descriptor provider -->
+					<bean id="flarmNetDescrProvider" class="org.ogn.commons.flarm.FlarmNetDescriptorProvider" />
+
+				</list>
+			</constructor-arg>
+		</bean>
 
 		<context:component-scan base-package="org.ogn.gateway" />
 
