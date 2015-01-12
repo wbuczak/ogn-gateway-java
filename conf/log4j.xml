@@ -4,8 +4,6 @@
 	debugging for certain parts of the system, change the "level" attribute of the appropriate logger. -->
 <log4j:configuration debug="false" threshold="debug" xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-
-
 	<!-- Create a ConsoleAppender. -->
 	<appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
 		<layout class="org.apache.log4j.PatternLayout">
@@ -98,7 +96,7 @@
 
 	<!-- log all receiver beacons received -->
 	<logger name="ReceiverBeaconsLog" additivity="false">
-		<level value="info" />
+		<level value="debug" />
 		<appender-ref ref="AprsReceiverBeaconsFileAppender" />
 	</logger>
 

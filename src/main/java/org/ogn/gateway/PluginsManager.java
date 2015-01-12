@@ -27,6 +27,8 @@ import org.ogn.commons.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jmx.export.annotation.ManagedAttribute;
+import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 /**
@@ -35,6 +37,7 @@ import org.springframework.stereotype.Service;
  * @author wbuczak
  */
 @Service
+@ManagedResource(objectName = "org.ogn.gateway:name=PluginsManager", description = "OGN gateway's plugins manager")
 public class PluginsManager {
 
     static Logger LOG = LoggerFactory.getLogger(PluginsManager.class);
@@ -128,6 +131,7 @@ public class PluginsManager {
         }// while
     }
 
+    @ManagedAttribute
     public int getRegisteredPluginsCount() {
         return plugins.size();
     }

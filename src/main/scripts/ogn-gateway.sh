@@ -20,11 +20,13 @@ OGN_GATEWAY_TMP_DIR=${OGN_GATEWAY_HOME}/tmp
 OGN_GATEWAY_PROPERTIES=${OGN_GATEWAY_CON_DIR}/gateway.properties
 
 OGN_GATEWAY_PROCSTATE_LOG_FILE=${OGN_GATEWAY_LOG_DIR}/procstate.log
-OGN_GATEWAY_LOG4J_CONF_FILE=file://${OGN_GATEWAY_CON_DIR}/log4j.xml
+OGN_GATEWAY_LOG4J_CONF_FILE=${OGN_GATEWAY_CON_DIR}/log4j.xml
 
 OGN_GATEWAY_OUT_LOG_FILE=${OGN_GATEWAY_LOG_DIR}/out.log
 
 OGN_GATEWAY_MAIN_CLASS=org.ogn.gateway.OgnGateway
+
+OGN_GATEWAY_JMX_PORT=61628
 
 OGN_GATEWAY_SRV_HOST=`hostname`
 OGN_GATEWAY_DOMAIN=`hostname -d`
@@ -33,7 +35,7 @@ OGN_GATEWAY_DOMAIN=`hostname -d`
 #DEBUG_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=5000,server=y,suspend=n"
 
 # options used to enable remote JMX management
-#JCONSOLE_REMOTE="-Dcom.sun.management.jmxremote.port=${MOBITRIP_SRV_JMX_PORT} -Dcom.sun.management.jmxremote.authenticate=true -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.password.file=conf/jmxremote.passwd -Dcom.sun.management.jmxremote.access.file=conf/jmxremote.access"
+JCONSOLE_REMOTE="-Dcom.sun.management.jmxremote.port=${OGN_GATEWAY_JMX_PORT} -Dcom.sun.management.jmxremote.authenticate=true -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.password.file=conf/jmxremote.passwd -Dcom.sun.management.jmxremote.access.file=conf/jmxremote.access"
 
 if [ ! -d ${OGN_GATEWAY_TMP_DIR} ] ; then
   mkdir ${OGN_GATEWAY_TMP_DIR}

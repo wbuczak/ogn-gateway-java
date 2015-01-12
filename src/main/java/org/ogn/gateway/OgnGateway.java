@@ -4,7 +4,7 @@
 
 package org.ogn.gateway;
 
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -19,8 +19,8 @@ public class OgnGateway {
         if (log4jConf != null)
             try {
                 // Load the log4j configuration - unfortunately pure SLF4J API does not yet provide
-                // watch-dog functionality - so we have to use log4j directly
-                PropertyConfigurator.configureAndWatch(System.getProperty("log4j.configuration"), 30 * 1000);
+                // watch-dog functionality - so we have to use log4j directly                
+                DOMConfigurator.configureAndWatch(System.getProperty("log4j.configuration"), 30 * 1000);                
             } catch (Exception ex) {
                 System.err.println("Unable to load log4j configuration file : " + ex.getMessage());
                 ex.printStackTrace();
@@ -34,8 +34,8 @@ public class OgnGateway {
         ctx.getEnvironment().setDefaultProfiles("PRO");
         // ctx.getEnvironment().setActiveProfiles("TEST");
         ctx.refresh();
-        
-        Configuration conf = ctx.getBean(Configuration.class);        
-        LOG.info("simulation mode: {}",conf.isSimulationModeOn());
+
+        Configuration conf = ctx.getBean(Configuration.class);
+        LOG.info("simulation mode: {}", conf.isSimulationModeOn());
     }
 }
