@@ -42,6 +42,24 @@
 				<exclude>*/**</exclude>
 			</excludes>
 		</fileSet>
+		
+		<!-- create empty log/aprs subfolder -->
+		<fileSet>
+			<directory>./</directory>
+			<outputDirectory>/log/aprs</outputDirectory>
+			<excludes>
+				<exclude>*/**</exclude>
+			</excludes>
+		</fileSet>
+		
+		<!-- create empty log/igc subfolder -->
+		<fileSet>
+			<directory>./</directory>
+			<outputDirectory>/log/igc</outputDirectory>
+			<excludes>
+				<exclude>*/**</exclude>
+			</excludes>
+		</fileSet>
 
 		<!-- create empty tmp folder -->
 		<fileSet>

@@ -33,7 +33,7 @@ public class ConfigurationTest {
         assertNotNull(config);
         assertEquals("plugins", config.getPluginsFolderName());
         assertEquals(30000, config.getScanningInterval());
-        assertEquals("testigc", config.getIgcFolder());
+        assertEquals("log/testigc", config.getIgcFolder());
         assertEquals(6, config.getMaxPacketErrors());
 
         assertEquals(true, config.isSimulationModeOn());

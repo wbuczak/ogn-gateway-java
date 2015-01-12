@@ -23,8 +23,7 @@
 			<constructor-arg>
 				<list>
 					<!-- flarmNet aircraft descriptor provider -->
-					<bean id="flarmNetDescrProvider" class="org.ogn.commons.flarm.FlarmNetDescriptorProvider" />
-
+					<bean class="org.ogn.commons.flarm.FlarmNetDescriptorProvider" />
 				</list>
 			</constructor-arg>
 		</bean>
@@ -35,7 +34,7 @@
 
 	<beans profile="TEST">
 
-		<context:property-placeholder location="classpath:ogn-gateway-test.properties"
+		<context:property-placeholder location="classpath:gateway-test.properties"
 			ignore-resource-not-found="true" ignore-unresolvable="true" />
 
 		<bean id="client" class="org.easymock.EasyMock" factory-method="createMock">

@@ -16,7 +16,7 @@ public class Configuration {
     @Value("${ogn.gateway.plugins.folder:plugins}")
     private String pluginsFolder;
 
-    @Value("${ogn.gateway.igc.folder:igc}")
+    @Value("${ogn.gateway.igc.folder:log/igc}")
     private String igcFolder;
 
     @Value("${ogn.gateway.plugins.scanning_interval:30000}")
