@@ -43,8 +43,14 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
     @Autowired
     Configuration conf;
 
-    static Logger LOG = LoggerFactory.getLogger("OgnGatewayPluginsLog");
-    static Logger LOG_REC = LoggerFactory.getLogger("ReceiverBeaconsLog");
+    static Logger LOG = LoggerFactory.getLogger(OgnGatewayProxy.class);
+    static Logger LOG_DISCARDED = LoggerFactory.getLogger("OgnGatewayProxyDiscardedLog");
+
+    static Logger LOG_AIR_RAW = LoggerFactory.getLogger("RawAircraftBeaconsLog");
+    static Logger LOG_AIR_DECODED = LoggerFactory.getLogger("DecodedAircraftBeaconsLog");
+
+    static Logger LOG_REC_RAW = LoggerFactory.getLogger("RawReceiverBeaconsLog");
+    static Logger LOG_REC_DECODED = LoggerFactory.getLogger("DecodedReceiverBeaconsLog");
 
     @PostConstruct
     public void init() {
@@ -62,36 +68,45 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
     @Override
     public void onUpdate(AircraftBeacon beacon, AircraftDescriptor descriptor) {
 
+        LOG_AIR_RAW.info("{}", beacon.getRawPacket());
+
+        if (LOG_AIR_DECODED.isInfoEnabled()) {
+            if (descriptor.isKnown())
+                LOG_AIR_DECODED
+                        .info("{} {} {}", beacon.getId(), JsonUtils.toJson(beacon), JsonUtils.toJson(descriptor));
+            else
+                LOG_AIR_DECODED.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
+        }
+
         String id = !descriptor.isKnown() ? beacon.getId() : descriptor.getRegNumber();
 
         // log to IGC file (non blocking operation)
         igcLogger.log(id, beacon.getLat(), beacon.getLon(), beacon.getAlt(), beacon.getRawPacket());
 
         // notify forwarders if certain condition is met
-        if (!beacon.isStealth() && !beacon.getAddressType().equals(AddressType.RANDOM)
-                && beacon.getErrorCount() < conf.getMaxPacketErrors()) {
+        AddressType type = beacon.getAddressType();
+        if (!beacon.isStealth() && !type.equals(AddressType.RANDOM) && !type.equals(AddressType.UNRECOGNIZED)
+                && beacon.getErrorCount() <= conf.getMaxPacketErrors()) {
 
             for (PluginHandler ph : pluginsManager.getRegisteredPlugins()) {
                 OgnBeaconForwarder p = ph.getPlugin();
 
-                if (LOG.isInfoEnabled()) {
-                    if (descriptor.isKnown())
-                        LOG.info("{} {} {} {}", p.getName(), p.getVersion(), JsonUtils.toJson(beacon),
-                                JsonUtils.toJson(descriptor));
-                    else
-                        LOG.info("{} {} {}", p.getName(), p.getVersion(), JsonUtils.toJson(beacon));
-                }
+                LOG.info("{} {} {}", p.getName(), p.getVersion(), beacon.getRawPacket());
 
                 if (!conf.isSimulationModeOn())
                     ph.onUpdate(beacon, descriptor);
             }// for
         }// if
+        else {
+            LOG_DISCARDED.info("{} {} {} {}", beacon.isStealth(), type, beacon.getErrorCount(), beacon.getRawPacket());
+        }
 
     }
 
     @Override
     public void onUpdate(ReceiverBeacon beacon) {
         // just log it
-        LOG_REC.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
+        LOG_REC_RAW.info("{}", beacon.getRawPacket());
+        LOG_REC_DECODED.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
     }
 }
