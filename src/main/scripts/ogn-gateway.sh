@@ -7,8 +7,13 @@
 
 TIME=`date +"%F %T.%3N"`
 
-# set the home path accordingly
-OGN_GATEWAY_HOME=${HOME}/ogn/ogn-gateway
+# check if OGN_HOME is set in the system
+if [ -z ${OGN_HOME1+x} ]; then
+  OGN_GATEWAY_HOME=${OGN_HOME}/ogn-gateway
+else
+  # set the default ong-gateway's home path
+  OGN_GATEWAY_HOME=${HOME}/ogn/ogn-gateway
+fi
 
 PROCESS_NAME=ogn-gateway
 
