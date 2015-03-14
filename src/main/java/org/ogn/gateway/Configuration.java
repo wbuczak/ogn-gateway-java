@@ -27,6 +27,9 @@ public class Configuration {
 
     @Value("${ogn.gateway.simulation:false}")
     private boolean simulationMode;
+    
+    @Value("${ogn.gateway.enable_clustering:false}")
+    private boolean clusteringEnabled;
 
     @ManagedAttribute
     public String getPluginsFolderName() {
@@ -51,6 +54,11 @@ public class Configuration {
     @ManagedAttribute
     public String getIgcFolder() {
         return igcFolder;
+    }
+    
+    @ManagedAttribute
+    public boolean isClusteringEnabled() {
+        return clusteringEnabled;
     }
 
 }

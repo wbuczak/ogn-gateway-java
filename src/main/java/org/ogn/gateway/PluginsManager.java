@@ -21,6 +21,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.ogn.commons.beacon.forwarder.OgnAircraftBeaconForwarder;
 import org.ogn.commons.utils.StringUtils;
@@ -64,6 +65,14 @@ public class PluginsManager {
         startPluginsRegistrationJob();
     }
 
+
+    @PreDestroy
+    public void preDestroy() {
+        for (PluginHandler ph : getRegisteredPlugins()) {
+            ph.stop();
+        }
+    }
+     
     public void stop() {
         if (pluginsRegistrationFuture != null) {
             pluginsRegistrationFuture.cancel(false);

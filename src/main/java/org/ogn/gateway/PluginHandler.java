@@ -80,6 +80,9 @@ public class PluginHandler implements AircraftBeaconListener {
     }
 
     public void stop() {
+        if (plugin != null)
+            plugin.stop();
+
         if (queueConsumerFeature != null)
             queueConsumerFeature.cancel(true);
     }
