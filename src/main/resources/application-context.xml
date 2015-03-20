@@ -26,7 +26,8 @@
 					<bean class="org.ogn.commons.db.FileDbDescriptorProvider" c:clazz="org.ogn.commons.db.ogn.OgnDb" />
 
 					<!-- FlarmNet aircraft file db. descriptor provider -->
-					<bean class="org.ogn.commons.db.FileDbDescriptorProvider" c:clazz="org.ogn.commons.db.flarmnet.FlarmNetDb" />
+					<!--  OGN no longer uses FlarmNet! -->
+					<!-- <bean class="org.ogn.commons.db.FileDbDescriptorProvider" c:clazz="org.ogn.commons.db.flarmnet.FlarmNetDb" /> -->
 
 				</list>
 			</constructor-arg>
