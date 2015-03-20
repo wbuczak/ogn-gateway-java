@@ -86,6 +86,7 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
         // notify forwarders if certain condition is met
         AddressType type = beacon.getAddressType();
         if (!beacon.isStealth() && !type.equals(AddressType.RANDOM) && !type.equals(AddressType.UNRECOGNIZED)
+                && descriptor.isTracked() 
                 && beacon.getErrorCount() <= conf.getMaxPacketErrors()) {
 
             for (PluginHandler ph : pluginsManager.getRegisteredPlugins()) {
