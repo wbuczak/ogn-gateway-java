@@ -98,7 +98,7 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
             }// for
         }// if
         else {
-            LOG_DISCARDED.info("{} {} {} {}", beacon.isStealth(), descriptor.isTracked(), type, beacon.getErrorCount(),
+            LOG_DISCARDED.info("{} {} {} {} {}", beacon.isStealth(), descriptor.isTracked(), type, beacon.getErrorCount(),
                     beacon.getRawPacket());
         }
 
