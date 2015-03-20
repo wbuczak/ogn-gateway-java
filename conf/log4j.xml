@@ -31,7 +31,7 @@
 		</layout>
 	</appender>
 
-	<appender name="OgnGatewayProxyAppender" class="org.apache.log4j.RollingFileAppender">
+	<appender name="OgnGatewayProxyForwardedAppender" class="org.apache.log4j.RollingFileAppender">
 		<param name="Append" value="true" />
 		<param name="File" value="${process.log.path}/proxy-forwarded.log" />
 		<param name="MaxFileSize" value="5MB" />
@@ -125,9 +125,9 @@
 		<appender-ref ref="FileAppender" />
 	</logger>
 
-	<logger name="org.ogn.gateway.OgnGatewayProxy" additivity="false">
+	<logger name="OgnGatewayProxyForwardedLog" additivity="false">
 		<level value="info" />
-		<appender-ref ref="OgnGatewayProxyAppender" />
+		<appender-ref ref="OgnGatewayProxyForwardedAppender" />
 	</logger>
 
 	<logger name="OgnGatewayProxyDiscardedLog" additivity="false">

@@ -43,7 +43,7 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
     @Autowired
     Configuration conf;
 
-    static Logger LOG = LoggerFactory.getLogger(OgnGatewayProxy.class);
+    static Logger LOG_FORWARDED = LoggerFactory.getLogger("OgnGatewayProxyForwardedLog");
     static Logger LOG_DISCARDED = LoggerFactory.getLogger("OgnGatewayProxyDiscardedLog");
 
     static Logger LOG_AIR_RAW = LoggerFactory.getLogger("RawAircraftBeaconsLog");
@@ -91,14 +91,15 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
             for (PluginHandler ph : pluginsManager.getRegisteredPlugins()) {
                 OgnBeaconForwarder p = ph.getPlugin();
 
-                LOG.info("{} {} {}", p.getName(), p.getVersion(), beacon.getRawPacket());
+                LOG_FORWARDED.info("{} {} {}", p.getName(), p.getVersion(), beacon.getRawPacket());
 
                 if (!conf.isSimulationModeOn())
                     ph.onUpdate(beacon, descriptor);
             }// for
         }// if
         else {
-            LOG_DISCARDED.info("{} {} {} {}", beacon.isStealth(), type, beacon.getErrorCount(), beacon.getRawPacket());
+            LOG_DISCARDED.info("{} {} {} {}", beacon.isStealth(), descriptor.isTracked(), type, beacon.getErrorCount(),
+                    beacon.getRawPacket());
         }
 
     }
