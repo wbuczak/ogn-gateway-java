@@ -22,11 +22,12 @@
 		<bean id="client" class="org.ogn.client.OgnClientFactory" factory-method="createClient" init-method="connect">
 			<constructor-arg>
 				<list>
-					<!-- OGN aircraft file db. descriptor provider -->
-					<bean class="org.ogn.commons.db.FileDbDescriptorProvider" c:clazz="org.ogn.commons.db.ogn.OgnDb" />
+					<!-- OGN aircraft file db. descriptor provider, default refresh rate: 15 min (900sec) -->
+					<bean class="org.ogn.commons.db.FileDbDescriptorProvider" c:clazz="org.ogn.commons.db.ogn.OgnDb"
+						c:dbRefreshInterval="${ogn.gateway.ogn_db_refresh_interval:900}" />
 
 					<!-- FlarmNet aircraft file db. descriptor provider -->
-					<!--  OGN no longer uses FlarmNet! -->
+					<!-- OGN no longer uses FlarmNet! -->
 					<!-- <bean class="org.ogn.commons.db.FileDbDescriptorProvider" c:clazz="org.ogn.commons.db.flarmnet.FlarmNetDb" /> -->
 
 				</list>
