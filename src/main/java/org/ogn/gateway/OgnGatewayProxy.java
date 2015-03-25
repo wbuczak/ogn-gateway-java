@@ -83,24 +83,36 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
         // log to IGC file (non blocking operation)
         igcLogger.log(id, beacon.getLat(), beacon.getLon(), beacon.getAlt(), beacon.getRawPacket());
 
-        // notify forwarders if certain condition is met
         AddressType type = beacon.getAddressType();
+        boolean discard = false;
+
+        // notify forwarders if certain condition is met
         if (!beacon.isStealth() && !type.equals(AddressType.RANDOM) && !type.equals(AddressType.UNRECOGNIZED)
-                && descriptor.isTracked() && beacon.getErrorCount() <= conf.getMaxPacketErrors()) {
+                && beacon.getErrorCount() <= conf.getMaxPacketErrors()) {
 
-            for (PluginHandler ph : pluginsManager.getRegisteredPlugins()) {
-                OgnBeaconForwarder p = ph.getPlugin();
+            // check also the descriptor - forward if either unknown or if known BUT! the tracking flag is ON
+            // (i.e. the person entering the record explicitly allowed tracking)
+            if (!descriptor.isKnown() || (descriptor.isKnown() && descriptor.isTracked()))
+                for (PluginHandler ph : pluginsManager.getRegisteredPlugins()) {
+                    OgnBeaconForwarder p = ph.getPlugin();
 
-                LOG_FORWARDED.info("{} {} {}", p.getName(), p.getVersion(), beacon.getRawPacket());
+                    LOG_FORWARDED.info("{} {} {} {} {} {} {} ", beacon.isStealth(), descriptor.isTracked(), type,
+                            beacon.getErrorCount(), p.getName(), p.getVersion(), beacon.getRawPacket());
 
-                if (!conf.isSimulationModeOn())
-                    ph.onUpdate(beacon, descriptor);
-            }// for
+                    if (!conf.isSimulationModeOn())
+                        ph.onUpdate(beacon, descriptor);
+                }// for
+            else
+                discard = true;
+
         }// if
         else {
-            LOG_DISCARDED.info("{} {} {} {} {}", beacon.isStealth(), descriptor.isTracked(), type, beacon.getErrorCount(),
-                    beacon.getRawPacket());
+            discard = true;
         }
+
+        if (discard)
+            LOG_DISCARDED.info("{} {} {} {} {}", beacon.isStealth(), descriptor.isTracked(), type,
+                    beacon.getErrorCount(), beacon.getRawPacket());
 
     }
 
