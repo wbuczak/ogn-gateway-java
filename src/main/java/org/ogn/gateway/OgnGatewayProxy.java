@@ -100,6 +100,9 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
                             beacon.getErrorCount(), p.getName(), p.getVersion(), beacon.getRawPacket());
 
                     if (!conf.isSimulationModeOn())
+
+                        // no need to wrap it in the try-catch - the call is just offering a beacon
+                        // to the handler's queue
                         ph.onUpdate(beacon, descriptor);
                 }// for
             else
