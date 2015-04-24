@@ -16,6 +16,7 @@ import org.ogn.commons.beacon.AircraftDescriptor;
 import org.ogn.commons.beacon.ReceiverBeacon;
 import org.ogn.commons.beacon.forwarder.OgnBeaconForwarder;
 import org.ogn.commons.igc.IgcLogger;
+import org.ogn.commons.utils.IgcUtils;
 import org.ogn.commons.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,10 +79,9 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
                 LOG_AIR_DECODED.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
         }
 
-        String id = !descriptor.isKnown() ? beacon.getId() : descriptor.getRegNumber();
-
         // log to IGC file (non blocking operation)
-        igcLogger.log(id, beacon.getLat(), beacon.getLon(), beacon.getAlt(), beacon.getRawPacket());
+        igcLogger.log(IgcUtils.toIgcLogFileId(beacon, descriptor), beacon.getLat(), beacon.getLon(),
+                beacon.getAlt(), beacon.getRawPacket());
 
         AddressType type = beacon.getAddressType();
         boolean discard = false;
