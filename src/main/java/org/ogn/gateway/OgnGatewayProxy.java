@@ -67,9 +67,9 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
     }
 
     @Override
-    public void onUpdate(AircraftBeacon beacon, AircraftDescriptor descriptor) {
+    public void onUpdate(final AircraftBeacon beacon, final AircraftDescriptor descriptor, final String rawBeacon) {
 
-        LOG_AIR_RAW.info("{}", beacon.getRawPacket());
+        LOG_AIR_RAW.info("{}", rawBeacon);
 
         if (LOG_AIR_DECODED.isInfoEnabled()) {
             if (descriptor.isKnown())
@@ -80,8 +80,8 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
         }
 
         // log to IGC file (non blocking operation)
-        igcLogger.log(IgcUtils.toIgcLogFileId(beacon, descriptor), beacon.getLat(), beacon.getLon(),
-                beacon.getAlt(), beacon.getRawPacket());
+        igcLogger.log(IgcUtils.toIgcLogFileId(beacon, descriptor), beacon.getLat(), beacon.getLon(), beacon.getAlt(),
+                beacon.getRawPacket());
 
         AddressType type = beacon.getAddressType();
         boolean discard = false;
@@ -103,7 +103,7 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 
                         // no need to wrap it in the try-catch - the call is just offering a beacon
                         // to the handler's queue
-                        ph.onUpdate(beacon, descriptor);
+                        ph.onUpdate(beacon, descriptor, rawBeacon);
                 }// for
             else
                 discard = true;
@@ -120,9 +120,9 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
     }
 
     @Override
-    public void onUpdate(ReceiverBeacon beacon) {
+    public void onUpdate(final ReceiverBeacon beacon, final String rawBeacon) {
         // just log it
-        LOG_REC_RAW.info("{}", beacon.getRawPacket());
+        LOG_REC_RAW.info("{}", rawBeacon);
         LOG_REC_DECODED.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
     }
 }

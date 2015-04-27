@@ -24,10 +24,12 @@ public class PluginHandler implements AircraftBeaconListener {
     static class AircraftBeaconWithDescriptor {
         AircraftBeacon beacon;
         AircraftDescriptor descriptor;
+        String rawBeacon;
 
-        AircraftBeaconWithDescriptor(AircraftBeacon beacon, AircraftDescriptor descriptor) {
+        AircraftBeaconWithDescriptor(AircraftBeacon beacon, AircraftDescriptor descriptor, String rawBeacon) {
             this.beacon = beacon;
             this.descriptor = descriptor;
+            this.rawBeacon = rawBeacon;
         }
     }
 
@@ -51,8 +53,8 @@ public class PluginHandler implements AircraftBeaconListener {
     }
 
     @Override
-    public void onUpdate(AircraftBeacon beacon, AircraftDescriptor descriptor) {
-        beacons.offer(new AircraftBeaconWithDescriptor(beacon, descriptor));
+    public void onUpdate(final AircraftBeacon beacon, final AircraftDescriptor descriptor, final String rawBeacon) {
+        beacons.offer(new AircraftBeaconWithDescriptor(beacon, descriptor, rawBeacon));
     }
 
     public void start() {
@@ -66,7 +68,7 @@ public class PluginHandler implements AircraftBeaconListener {
                         try {
                             // get next beacon and proceed with sending it
                             beacon = beacons.take();
-                            plugin.onBeacon(beacon.beacon, beacon.descriptor);
+                            plugin.onBeacon(beacon.beacon, beacon.descriptor, beacon.rawBeacon);
                         } catch (InterruptedException e) {
                             LOG.warn("pugin-handler for pugin: {} - interrupted exception caught", plugin.getName());
                             Thread.currentThread().interrupt();
