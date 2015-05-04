@@ -8,7 +8,7 @@
 TIME=`date +"%F %T.%3N"`
 
 # check if OGN_HOME is set in the system
-if [ -z ${OGN_HOME1+x} ]; then
+if [ ! -z ${OGN_HOME} ]; then
   OGN_GATEWAY_HOME=${OGN_HOME}/ogn-gateway
 else
   # set the default ong-gateway's home path
