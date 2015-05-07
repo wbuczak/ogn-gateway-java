@@ -42,6 +42,9 @@ OGN_GATEWAY_DOMAIN=`hostname -d`
 # options used to enable remote JMX management
 JCONSOLE_REMOTE="-Dcom.sun.management.jmxremote.port=${OGN_GATEWAY_JMX_PORT} -Dcom.sun.management.jmxremote.authenticate=true -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.password.file=conf/jmxremote.passwd -Dcom.sun.management.jmxremote.access.file=conf/jmxremote.access"
 
+# uncomment and update accordingly if you need to tune ogn-client connection
+#APRS_OPTS="-Dogn.server.name=52.16.247.84"
+
 if [ ! -d ${OGN_GATEWAY_TMP_DIR} ] ; then
   mkdir ${OGN_GATEWAY_TMP_DIR}
 fi
@@ -98,7 +101,7 @@ process_start() {
 
 really_start() {
 
-  ${JAVA_BIN} ${DEBUG_OPTS} ${JCONSOLE_REMOTE} ${JVM_OPTS} \
+  ${JAVA_BIN} ${DEBUG_OPTS} ${JCONSOLE_REMOTE} ${JVM_OPTS} ${APRS_OPTS} \
          -Djava.library.path=${OGN_GATEWAY_LIB_DIR} \
          -Djava.io.tmpdir=${OGN_GATEWAY_TMP_DIR} \
          -Dlog4j.configuration=${OGN_GATEWAY_LOG4J_CONF_FILE} \
