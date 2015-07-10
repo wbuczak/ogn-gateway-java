@@ -80,8 +80,7 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
         }
 
         // log to IGC file (non blocking operation)
-        igcLogger.log(IgcUtils.toIgcLogFileId(beacon, descriptor), beacon.getLat(), beacon.getLon(), beacon.getAlt(),
-                beacon.getRawPacket());
+        igcLogger.log(beacon, descriptor);
 
         AddressType type = beacon.getAddressType();
         boolean discard = false;
