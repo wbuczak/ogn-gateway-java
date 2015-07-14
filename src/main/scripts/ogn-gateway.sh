@@ -56,7 +56,8 @@ PID_FILE=${OGN_GATEWAY_TMP_DIR}/ogn-gateway.pid
 # Make sure the JAVA_BIN variable points to the java bin directory on your machine
 JAVA_BIN=/usr/bin/java
 
-JVM_OPTS="-Xms256m -Xmx256m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100"
+#JVM_OPTS="-Xms256m -Xmx256m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100"
+JVM_OPTS="-Xms256m -Xmx256m"
 
 RETVAL=0
 
