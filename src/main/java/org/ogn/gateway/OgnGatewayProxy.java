@@ -30,8 +30,7 @@ import org.springframework.stereotype.Service;
  * @author wbuczak
  */
 @Service
-public class OgnGatewayProxy implements AircraftBeaconListener,
-		ReceiverBeaconListener {
+public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconListener {
 
 	@Autowired
 	private PluginsManager pluginsManager;
@@ -45,20 +44,14 @@ public class OgnGatewayProxy implements AircraftBeaconListener,
 	@Autowired
 	Configuration conf;
 
-	static Logger LOG_FORWARDED = LoggerFactory
-			.getLogger("OgnGatewayProxyForwardedLog");
-	static Logger LOG_DISCARDED = LoggerFactory
-			.getLogger("OgnGatewayProxyDiscardedLog");
+	static Logger LOG_FORWARDED = LoggerFactory.getLogger("OgnGatewayProxyForwardedLog");
+	static Logger LOG_DISCARDED = LoggerFactory.getLogger("OgnGatewayProxyDiscardedLog");
 
-	static Logger LOG_AIR_RAW = LoggerFactory
-			.getLogger("RawAircraftBeaconsLog");
-	static Logger LOG_AIR_DECODED = LoggerFactory
-			.getLogger("DecodedAircraftBeaconsLog");
+	static Logger LOG_AIR_RAW = LoggerFactory.getLogger("RawAircraftBeaconsLog");
+	static Logger LOG_AIR_DECODED = LoggerFactory.getLogger("DecodedAircraftBeaconsLog");
 
-	static Logger LOG_REC_RAW = LoggerFactory
-			.getLogger("RawReceiverBeaconsLog");
-	static Logger LOG_REC_DECODED = LoggerFactory
-			.getLogger("DecodedReceiverBeaconsLog");
+	static Logger LOG_REC_RAW = LoggerFactory.getLogger("RawReceiverBeaconsLog");
+	static Logger LOG_REC_DECODED = LoggerFactory.getLogger("DecodedReceiverBeaconsLog");
 
 	@PostConstruct
 	public void init() {
@@ -74,18 +67,16 @@ public class OgnGatewayProxy implements AircraftBeaconListener,
 	}
 
 	@Override
-	public void onUpdate(final AircraftBeacon beacon,
-			final AircraftDescriptor descriptor, final String rawBeacon) {
+	public void onUpdate(final AircraftBeacon beacon, final AircraftDescriptor descriptor, final String rawBeacon) {
 
 		LOG_AIR_RAW.info("{}", rawBeacon);
 
 		if (LOG_AIR_DECODED.isInfoEnabled()) {
 			if (descriptor.isKnown())
-				LOG_AIR_DECODED.info("{} {} {}", beacon.getId(),
-						JsonUtils.toJson(beacon), JsonUtils.toJson(descriptor));
+				LOG_AIR_DECODED
+						.info("{} {} {}", beacon.getId(), JsonUtils.toJson(beacon), JsonUtils.toJson(descriptor));
 			else
-				LOG_AIR_DECODED.info("{} {}", beacon.getId(),
-						JsonUtils.toJson(beacon));
+				LOG_AIR_DECODED.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
 		}
 
 		// log to IGC file (non blocking operation)
@@ -95,22 +86,18 @@ public class OgnGatewayProxy implements AircraftBeaconListener,
 		boolean discard = false;
 
 		// notify forwarders if certain condition is met
-		if (!type.equals(AddressType.RANDOM)
-				&& !type.equals(AddressType.UNRECOGNIZED)
+		if (!type.equals(AddressType.RANDOM) && !type.equals(AddressType.UNRECOGNIZED)
 				&& beacon.getErrorCount() <= conf.getMaxPacketErrors()) {
 
 			// check also the descriptor - forward if either unknown or if known
 			// BUT! the tracking flag is ON
 			// (i.e. the person entering the record explicitly allowed tracking)
-			if (!descriptor.isKnown()
-					|| (descriptor.isKnown() && descriptor.isTracked()))
+			if (!descriptor.isKnown() || (descriptor.isKnown() && descriptor.isTracked()))
 				for (PluginHandler ph : pluginsManager.getRegisteredPlugins()) {
 					OgnBeaconForwarder p = ph.getPlugin();
 
-					LOG_FORWARDED.info("{} {} {} {} {} {} {} ",
-							beacon.isStealth(), descriptor.isTracked(), type,
-							beacon.getErrorCount(), p.getName(),
-							p.getVersion(), beacon.getRawPacket());
+					LOG_FORWARDED.info("{} {} {} {} {} {} {} ", beacon.isStealth(), descriptor.isTracked(), type,
+							beacon.getErrorCount(), p.getName(), p.getVersion(), beacon.getRawPacket());
 
 					if (!conf.isSimulationModeOn())
 
@@ -128,9 +115,8 @@ public class OgnGatewayProxy implements AircraftBeaconListener,
 		}
 
 		if (discard)
-			LOG_DISCARDED.info("{} {} {} {} {}", beacon.isStealth(),
-					descriptor.isTracked(), type, beacon.getErrorCount(),
-					beacon.getRawPacket());
+			LOG_DISCARDED.info("{} {} {} {} {}", beacon.isStealth(), descriptor.isTracked(), type,
+					beacon.getErrorCount(), beacon.getRawPacket());
 
 	}
 

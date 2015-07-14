@@ -19,61 +19,61 @@ import org.junit.Test;
 
 public class PluginsManagerTest2 {
 
-    Configuration conf;
+	Configuration conf;
 
-    @Before
-    public void before() throws Exception {
-        Path dir = Paths.get("src/test/resources/plugins2");
-        Path file = Paths.get("src/test/resources/plugins2/test-plugin1.jar");
+	@Before
+	public void before() throws Exception {
+		Path dir = Paths.get("src/test/resources/plugins2");
+		Path file = Paths.get("src/test/resources/plugins2/test-plugin1.jar");
 
-        if (Files.exists(dir)) {
+		if (Files.exists(dir)) {
 
-            if (Files.exists(file))
-                Files.delete(file);
+			if (Files.exists(file))
+				Files.delete(file);
 
-            Files.delete(dir);
-        }
+			Files.delete(dir);
+		}
 
-        // create an empty folder
-        Files.createDirectory(dir);
-    }
+		// create an empty folder
+		Files.createDirectory(dir);
+	}
 
-    @Test(timeout = 5000)
-    public void test2() throws Exception {
+	@Test(timeout = 5000)
+	public void test2() throws Exception {
 
-        PluginsManager pluginsManager = new PluginsManager();
+		PluginsManager pluginsManager = new PluginsManager();
 
-        conf = EasyMock.createMock(Configuration.class);
-        expect(conf.getPluginsFolderName()).andReturn("src/test/resources/plugins2");
-        expectLastCall().atLeastOnce();
+		conf = EasyMock.createMock(Configuration.class);
+		expect(conf.getPluginsFolderName()).andReturn("src/test/resources/plugins2");
+		expectLastCall().atLeastOnce();
 
-        expect(conf.getScanningInterval()).andReturn(300);
-        expectLastCall().atLeastOnce();
+		expect(conf.getScanningInterval()).andReturn(300);
+		expectLastCall().atLeastOnce();
 
-        replay(conf);
+		replay(conf);
 
-        pluginsManager.setConfig(conf);
+		pluginsManager.setConfig(conf);
 
-        pluginsManager.init();
-        Thread.sleep(1000);
+		pluginsManager.init();
+		Thread.sleep(1000);
 
-        // no plugins expected at first
-        assertEquals(0, pluginsManager.getRegisteredPluginsCount());
+		// no plugins expected at first
+		assertEquals(0, pluginsManager.getRegisteredPluginsCount());
 
-        Path source = Paths.get("src/test/resources/plugins/test-plugin1.jar");
-        Path destination = Paths.get("src/test/resources/plugins2/test-plugin1.jar");
+		Path source = Paths.get("src/test/resources/plugins/test-plugin1.jar");
+		Path destination = Paths.get("src/test/resources/plugins2/test-plugin1.jar");
 
-        Files.copy(source, destination);
+		Files.copy(source, destination);
 
-        while (pluginsManager.getRegisteredPluginsCount() < 1) {
-            Thread.sleep(50);
-        }
+		while (pluginsManager.getRegisteredPluginsCount() < 1) {
+			Thread.sleep(50);
+		}
 
-        // there should now only be one plugin registered
-        assertEquals(1, pluginsManager.getRegisteredPluginsCount());
+		// there should now only be one plugin registered
+		assertEquals(1, pluginsManager.getRegisteredPluginsCount());
 
-        pluginsManager.stop();
+		pluginsManager.stop();
 
-        Thread.sleep(2500);
-    }
+		Thread.sleep(2500);
+	}
 }

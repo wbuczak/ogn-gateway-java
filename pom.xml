@@ -86,11 +86,11 @@
 		<!-- END SPRING libraries -->
 
 		<!-- Hazelcast clustering -->
-		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-all</artifactId>
-			<version>${hazelcast.version}</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.hazelcast</groupId> -->
+<!-- 			<artifactId>hazelcast-all</artifactId> -->
+<!-- 			<version>${hazelcast.version}</version> -->
+<!-- 		</dependency> -->
 
 	</dependencies>
 

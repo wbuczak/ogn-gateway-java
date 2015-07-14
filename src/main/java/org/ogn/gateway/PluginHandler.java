@@ -19,73 +19,73 @@ import org.slf4j.LoggerFactory;
 
 public class PluginHandler implements AircraftBeaconListener {
 
-    static Logger LOG = LoggerFactory.getLogger(PluginHandler.class);
+	static Logger LOG = LoggerFactory.getLogger(PluginHandler.class);
 
-    static class AircraftBeaconWithDescriptor {
-        AircraftBeacon beacon;
-        AircraftDescriptor descriptor;
-        String rawBeacon;
+	static class AircraftBeaconWithDescriptor {
+		AircraftBeacon beacon;
+		AircraftDescriptor descriptor;
+		String rawBeacon;
 
-        AircraftBeaconWithDescriptor(AircraftBeacon beacon, AircraftDescriptor descriptor, String rawBeacon) {
-            this.beacon = beacon;
-            this.descriptor = descriptor;
-            this.rawBeacon = rawBeacon;
-        }
-    }
+		AircraftBeaconWithDescriptor(AircraftBeacon beacon, AircraftDescriptor descriptor, String rawBeacon) {
+			this.beacon = beacon;
+			this.descriptor = descriptor;
+			this.rawBeacon = rawBeacon;
+		}
+	}
 
-    private OgnAircraftBeaconForwarder plugin;
+	private OgnAircraftBeaconForwarder plugin;
 
-    private BlockingQueue<AircraftBeaconWithDescriptor> beacons = new LinkedBlockingQueue<>();
+	private BlockingQueue<AircraftBeaconWithDescriptor> beacons = new LinkedBlockingQueue<>();
 
-    private static ExecutorService executor;
-    private Future<?> queueConsumerFeature;
+	private static ExecutorService executor;
+	private Future<?> queueConsumerFeature;
 
-    public PluginHandler(OgnAircraftBeaconForwarder plugin) {
-        this.plugin = plugin;
-        // share one executor across all handlers
-        if (executor == null) {
-            executor = Executors.newCachedThreadPool();
-        }
-    }
+	public PluginHandler(OgnAircraftBeaconForwarder plugin) {
+		this.plugin = plugin;
+		// share one executor across all handlers
+		if (executor == null) {
+			executor = Executors.newCachedThreadPool();
+		}
+	}
 
-    public OgnAircraftBeaconForwarder getPlugin() {
-        return this.plugin;
-    }
+	public OgnAircraftBeaconForwarder getPlugin() {
+		return this.plugin;
+	}
 
-    @Override
-    public void onUpdate(final AircraftBeacon beacon, final AircraftDescriptor descriptor, final String rawBeacon) {
-        beacons.offer(new AircraftBeaconWithDescriptor(beacon, descriptor, rawBeacon));
-    }
+	@Override
+	public void onUpdate(final AircraftBeacon beacon, final AircraftDescriptor descriptor, final String rawBeacon) {
+		beacons.offer(new AircraftBeaconWithDescriptor(beacon, descriptor, rawBeacon));
+	}
 
-    public void start() {
-        if (queueConsumerFeature == null) {
-            queueConsumerFeature = executor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    LOG.debug("starting plugin handler poller for plugin {}:{}", plugin.getName(), plugin.getVersion());
-                    while (!Thread.interrupted()) {
-                        AircraftBeaconWithDescriptor beacon;
-                        try {
-                            // get next beacon and proceed with sending it
-                            beacon = beacons.take();
-                            plugin.onBeacon(beacon.beacon, beacon.descriptor, beacon.rawBeacon);
-                        } catch (InterruptedException e) {
-                            LOG.warn("pugin-handler for pugin: {} - interrupted exception caught", plugin.getName());
-                            Thread.currentThread().interrupt();
-                            continue;
-                        }
-                    }// while
+	public void start() {
+		if (queueConsumerFeature == null) {
+			queueConsumerFeature = executor.submit(new Runnable() {
+				@Override
+				public void run() {
+					LOG.debug("starting plugin handler poller for plugin {}:{}", plugin.getName(), plugin.getVersion());
+					while (!Thread.interrupted()) {
+						AircraftBeaconWithDescriptor beacon;
+						try {
+							// get next beacon and proceed with sending it
+							beacon = beacons.take();
+							plugin.onBeacon(beacon.beacon, beacon.descriptor, beacon.rawBeacon);
+						} catch (InterruptedException e) {
+							LOG.warn("pugin-handler for pugin: {} - interrupted exception caught", plugin.getName());
+							Thread.currentThread().interrupt();
+							continue;
+						}
+					}// while
 
-                }
-            });
-        }
-    }
+				}
+			});
+		}
+	}
 
-    public void stop() {
-        if (plugin != null)
-            plugin.stop();
+	public void stop() {
+		if (plugin != null)
+			plugin.stop();
 
-        if (queueConsumerFeature != null)
-            queueConsumerFeature.cancel(true);
-    }
+		if (queueConsumerFeature != null)
+			queueConsumerFeature.cancel(true);
+	}
 }

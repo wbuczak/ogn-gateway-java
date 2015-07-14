@@ -33,7 +33,8 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 /**
- * this service takes care of periodic scanning and registration of gateway plug-ins
+ * this service takes care of periodic scanning and registration of gateway
+ * plug-ins
  * 
  * @author wbuczak
  */
@@ -41,115 +42,115 @@ import org.springframework.stereotype.Service;
 @ManagedResource(objectName = "org.ogn.gateway:name=PluginsManager", description = "OGN gateway's plugins manager")
 public class PluginsManager {
 
-    static Logger LOG = LoggerFactory.getLogger(PluginsManager.class);
+	static Logger LOG = LoggerFactory.getLogger(PluginsManager.class);
 
-    Configuration conf;
+	Configuration conf;
 
-    private ConcurrentMap<String, PluginHandler> plugins = new ConcurrentHashMap<>();
+	private ConcurrentMap<String, PluginHandler> plugins = new ConcurrentHashMap<>();
 
-    private ScheduledExecutorService scheduledExecutor;
+	private ScheduledExecutorService scheduledExecutor;
 
-    private volatile Future<?> pluginsRegistrationFuture;
+	private volatile Future<?> pluginsRegistrationFuture;
 
-    @Autowired
-    public void setConfig(final Configuration conf) {
-        this.conf = conf;
-    }
+	@Autowired
+	public void setConfig(final Configuration conf) {
+		this.conf = conf;
+	}
 
-    public PluginsManager() {
-        scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
-    }
+	public PluginsManager() {
+		scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+	}
 
-    @PostConstruct
-    public void init() {
-        startPluginsRegistrationJob();
-    }
+	@PostConstruct
+	public void init() {
+		startPluginsRegistrationJob();
+	}
 
+	@PreDestroy
+	public void preDestroy() {
+		for (PluginHandler ph : getRegisteredPlugins()) {
+			ph.stop();
+		}
+	}
 
-    @PreDestroy
-    public void preDestroy() {
-        for (PluginHandler ph : getRegisteredPlugins()) {
-            ph.stop();
-        }
-    }
-     
-    public void stop() {
-        if (pluginsRegistrationFuture != null) {
-            pluginsRegistrationFuture.cancel(false);
-        }
-    }
+	public void stop() {
+		if (pluginsRegistrationFuture != null) {
+			pluginsRegistrationFuture.cancel(false);
+		}
+	}
 
-    private void startPluginsRegistrationJob() {
-        if (pluginsRegistrationFuture == null || pluginsRegistrationFuture.isCancelled()) {
-            pluginsRegistrationFuture = scheduledExecutor.scheduleAtFixedRate(new Runnable() {
+	private void startPluginsRegistrationJob() {
+		if (pluginsRegistrationFuture == null || pluginsRegistrationFuture.isCancelled()) {
+			pluginsRegistrationFuture = scheduledExecutor.scheduleAtFixedRate(new Runnable() {
 
-                @Override
-                public void run() {
-                    registerPlugins();
-                }
-            }, 0, conf.getScanningInterval(), TimeUnit.MILLISECONDS);
-        }
-    }
+				@Override
+				public void run() {
+					registerPlugins();
+				}
+			}, 0, conf.getScanningInterval(), TimeUnit.MILLISECONDS);
+		}
+	}
 
-    public synchronized void registerPlugins() {
-        File loc = new File(conf.getPluginsFolderName());
+	public synchronized void registerPlugins() {
+		File loc = new File(conf.getPluginsFolderName());
 
-        File[] flist = loc.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.getPath().toLowerCase().endsWith(".jar");
-            }
-        });
+		File[] flist = loc.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File file) {
+				return file.getPath().toLowerCase().endsWith(".jar");
+			}
+		});
 
-        URL[] urls = new URL[flist.length];
+		URL[] urls = new URL[flist.length];
 
-        for (int i = 0; i < flist.length; i++)
-            try {
-                urls[i] = flist[i].toURI().toURL();
-            } catch (MalformedURLException e) {
-                LOG.error("failed to register plug-in", e);
-            }
+		for (int i = 0; i < flist.length; i++)
+			try {
+				urls[i] = flist[i].toURI().toURL();
+			} catch (MalformedURLException e) {
+				LOG.error("failed to register plug-in", e);
+			}
 
-        URLClassLoader ucl = new URLClassLoader(urls);
+		URLClassLoader ucl = new URLClassLoader(urls);
 
-        ServiceLoader<OgnAircraftBeaconForwarder> sl = ServiceLoader.load(OgnAircraftBeaconForwarder.class, ucl);
+		ServiceLoader<OgnAircraftBeaconForwarder> sl = ServiceLoader.load(OgnAircraftBeaconForwarder.class, ucl);
 
-        Iterator<OgnAircraftBeaconForwarder> it = sl.iterator();
+		Iterator<OgnAircraftBeaconForwarder> it = sl.iterator();
 
-        while (it.hasNext()) {
-            OgnAircraftBeaconForwarder bf = it.next();
+		while (it.hasNext()) {
+			OgnAircraftBeaconForwarder bf = it.next();
 
-            LOG.trace("loading plug-in: {}", bf.getClass().getName());
+			LOG.trace("loading plug-in: {}", bf.getClass().getName());
 
-            String key = pluginKey(bf.getName(), bf.getVersion());
+			String key = pluginKey(bf.getName(), bf.getVersion());
 
-            // TODO: Should we register the newest (higher) version of a plug-in if two same
-            // plug-ins are available (with same name) ?
-            String md5key = StringUtils.md5(key);
+			// TODO: Should we register the newest (higher) version of a plug-in
+			// if two same
+			// plug-ins are available (with same name) ?
+			String md5key = StringUtils.md5(key);
 
-            // if not yet registered
-            if (!plugins.containsKey(md5key)) {
-                LOG.info("registering plug-in {} {} {} {}", bf.getClass().getName(), bf.getName(), bf.getVersion(),
-                        bf.getDescription());
+			// if not yet registered
+			if (!plugins.containsKey(md5key)) {
+				LOG.info("registering plug-in {} {} {} {}", bf.getClass().getName(), bf.getName(), bf.getVersion(),
+						bf.getDescription());
 
-                PluginHandler ph = new PluginHandler(bf);
-                ph.start();
-                plugins.putIfAbsent(StringUtils.md5(key), ph);
-            }// if
+				PluginHandler ph = new PluginHandler(bf);
+				ph.start();
+				plugins.putIfAbsent(StringUtils.md5(key), ph);
+			}// if
 
-        }// while
-    }
+		}// while
+	}
 
-    @ManagedAttribute
-    public int getRegisteredPluginsCount() {
-        return plugins.size();
-    }
+	@ManagedAttribute
+	public int getRegisteredPluginsCount() {
+		return plugins.size();
+	}
 
-    static String pluginKey(final String pluginName, final String pluginVersion) {
-        return String.format("%s:%s", pluginName, pluginVersion);
-    }
+	static String pluginKey(final String pluginName, final String pluginVersion) {
+		return String.format("%s:%s", pluginName, pluginVersion);
+	}
 
-    public Collection<PluginHandler> getRegisteredPlugins() {
-        return Collections.unmodifiableCollection(plugins.values());
-    }
+	public Collection<PluginHandler> getRegisteredPlugins() {
+		return Collections.unmodifiableCollection(plugins.values());
+	}
 }

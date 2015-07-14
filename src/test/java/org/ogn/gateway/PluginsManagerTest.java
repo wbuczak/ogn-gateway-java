@@ -14,39 +14,39 @@ import org.junit.Test;
 
 public class PluginsManagerTest {
 
-    Configuration conf;
+	Configuration conf;
 
-    @Test(timeout = 4000)
-    public void test() throws Exception {
-        PluginsManager pluginsManager = new PluginsManager();
+	@Test(timeout = 4000)
+	public void test() throws Exception {
+		PluginsManager pluginsManager = new PluginsManager();
 
-        conf = EasyMock.createMock(Configuration.class);
-        expect(conf.getPluginsFolderName()).andReturn("src/test/resources/plugins");
-        expectLastCall().atLeastOnce();
+		conf = EasyMock.createMock(Configuration.class);
+		expect(conf.getPluginsFolderName()).andReturn("src/test/resources/plugins");
+		expectLastCall().atLeastOnce();
 
-        expect(conf.getScanningInterval()).andReturn(500);
-        expectLastCall().atLeastOnce();
+		expect(conf.getScanningInterval()).andReturn(500);
+		expectLastCall().atLeastOnce();
 
-        replay(conf);
+		replay(conf);
 
-        pluginsManager.setConfig(conf);
+		pluginsManager.setConfig(conf);
 
-        assertEquals(0, pluginsManager.getRegisteredPluginsCount());
-        pluginsManager.registerPlugins();
-        // call more times the same registration
-        pluginsManager.registerPlugins();
-        pluginsManager.registerPlugins();
+		assertEquals(0, pluginsManager.getRegisteredPluginsCount());
+		pluginsManager.registerPlugins();
+		// call more times the same registration
+		pluginsManager.registerPlugins();
+		pluginsManager.registerPlugins();
 
-        // there should only be one plugin registered
-        assertEquals(1, pluginsManager.getRegisteredPluginsCount());
+		// there should only be one plugin registered
+		assertEquals(1, pluginsManager.getRegisteredPluginsCount());
 
-        pluginsManager.init();
+		pluginsManager.init();
 
-        Thread.sleep(2500);
+		Thread.sleep(2500);
 
-        // there should only be one plugin registered
-        assertEquals(1, pluginsManager.getRegisteredPluginsCount());
+		// there should only be one plugin registered
+		assertEquals(1, pluginsManager.getRegisteredPluginsCount());
 
-        pluginsManager.stop();
-    }
+		pluginsManager.stop();
+	}
 }
