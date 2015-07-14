@@ -31,6 +31,7 @@ public class OgnGateway {
 	public static void main(String[] args) {
 		configureLogging();
 		LOG.info("starting OGN gateway process");
+		@SuppressWarnings("resource")
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:application-context.xml");
 		ctx.getEnvironment().setDefaultProfiles("PRO");
 		// ctx.getEnvironment().setActiveProfiles("TEST");
