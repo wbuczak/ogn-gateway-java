@@ -24,7 +24,7 @@ public class PluginsManagerTest2 {
 	@Before
 	public void before() throws Exception {
 		Path dir = Paths.get("src/test/resources/plugins2");
-		Path file = Paths.get("src/test/resources/plugins2/test-plugin1.jar");
+		Path file = Paths.get("src/test/resources/plugins2/ogn-gateway-duplicates-1.0.0.jar");
 
 		if (Files.exists(dir)) {
 
@@ -58,19 +58,19 @@ public class PluginsManagerTest2 {
 		Thread.sleep(1000);
 
 		// no plugins expected at first
-		assertEquals(0, pluginsManager.getRegisteredPluginsCount());
+		assertEquals(0, pluginsManager.getRegisteredAircraftPluginsCount());
 
-		Path source = Paths.get("src/test/resources/plugins/test-plugin1.jar");
-		Path destination = Paths.get("src/test/resources/plugins2/test-plugin1.jar");
+		Path source = Paths.get("src/test/resources/plugins/ogn-gateway-duplicates-1.0.0.jar");
+		Path destination = Paths.get("src/test/resources/plugins2/ogn-gateway-duplicates-1.0.0.jar");
 
 		Files.copy(source, destination);
 
-		while (pluginsManager.getRegisteredPluginsCount() < 1) {
+		while (pluginsManager.getRegisteredAircraftPluginsCount() < 1) {
 			Thread.sleep(50);
 		}
 
 		// there should now only be one plugin registered
-		assertEquals(1, pluginsManager.getRegisteredPluginsCount());
+		assertEquals(1, pluginsManager.getRegisteredAircraftPluginsCount());
 
 		pluginsManager.stop();
 

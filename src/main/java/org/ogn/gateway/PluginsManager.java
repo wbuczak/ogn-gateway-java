@@ -24,6 +24,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.ogn.commons.beacon.forwarder.OgnAircraftBeaconForwarder;
+import org.ogn.commons.beacon.forwarder.OgnReceiverBeaconForwarder;
 import org.ogn.commons.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,8 @@ public class PluginsManager {
 
 	Configuration conf;
 
-	private ConcurrentMap<String, PluginHandler> plugins = new ConcurrentHashMap<>();
+	private ConcurrentMap<String, PluginHandler> aircraftPlugins = new ConcurrentHashMap<>();
+	private ConcurrentMap<String, PluginHandler> receiverPlugins = new ConcurrentHashMap<>();
 
 	private ScheduledExecutorService scheduledExecutor;
 
@@ -68,7 +70,11 @@ public class PluginsManager {
 
 	@PreDestroy
 	public void preDestroy() {
-		for (PluginHandler ph : getRegisteredPlugins()) {
+		for (PluginHandler ph : getRegisteredAircraftPlugins()) {
+			ph.stop();
+		}
+
+		for (PluginHandler ph : getRegisteredReceiverPlugins()) {
 			ph.stop();
 		}
 	}
@@ -115,42 +121,70 @@ public class PluginsManager {
 		ServiceLoader<OgnAircraftBeaconForwarder> sl = ServiceLoader.load(OgnAircraftBeaconForwarder.class, ucl);
 
 		Iterator<OgnAircraftBeaconForwarder> it = sl.iterator();
-
 		while (it.hasNext()) {
 			OgnAircraftBeaconForwarder bf = it.next();
 
 			LOG.trace("loading plug-in: {}", bf.getClass().getName());
 
-			String key = pluginKey(bf.getName(), bf.getVersion());
+			String key = pluginKey(OgnAircraftBeaconForwarder.class, bf.getName(), bf.getVersion());
 
-			// TODO: Should we register the newest (higher) version of a plug-in
-			// if two same
-			// plug-ins are available (with same name) ?
 			String md5key = StringUtils.md5(key);
 
 			// if not yet registered
-			if (!plugins.containsKey(md5key)) {
-				LOG.info("registering plug-in {} {} {} {}", bf.getClass().getName(), bf.getName(), bf.getVersion(),
-						bf.getDescription());
+			if (!aircraftPlugins.containsKey(md5key)) {
+				LOG.info("registering OgnAircraftBeaconForwarder plug-in: {} [ name: {}, version: {}, descr.: {} ]", bf
+						.getClass().getName(), bf.getName(), bf.getVersion(), bf.getDescription());
 
-				PluginHandler ph = new PluginHandler(bf);
+				PluginHandler ph = new AircraftPluginHandler(bf);
 				ph.start();
-				plugins.putIfAbsent(StringUtils.md5(key), ph);
+				aircraftPlugins.putIfAbsent(md5key, ph);
 			}// if
-
 		}// while
+
+		ServiceLoader<OgnReceiverBeaconForwarder> sl2 = ServiceLoader.load(OgnReceiverBeaconForwarder.class, ucl);
+		Iterator<OgnReceiverBeaconForwarder> it2 = sl2.iterator();
+		while (it2.hasNext()) {
+			OgnReceiverBeaconForwarder bf = it2.next();
+
+			LOG.trace("loading plug-in: {}", bf.getClass().getName());
+
+			String key = pluginKey(OgnReceiverBeaconForwarder.class, bf.getName(), bf.getVersion());
+
+			String md5key = StringUtils.md5(key);
+
+			// if not yet registered
+			if (!receiverPlugins.containsKey(md5key)) {
+				LOG.info("registering OgnReceiverBeaconForwarder plug-in: {} {} {} {}", bf.getClass().getName(),
+						bf.getName(), bf.getVersion(), bf.getDescription());
+
+				PluginHandler ph = new ReceiverPluginHandler(bf);
+				ph.start();
+				receiverPlugins.putIfAbsent(md5key, ph);
+			}// if
+		}// while
+
 	}
 
 	@ManagedAttribute
-	public int getRegisteredPluginsCount() {
-		return plugins.size();
+	public int getRegisteredAircraftPluginsCount() {
+		return aircraftPlugins.size();
 	}
 
-	static String pluginKey(final String pluginName, final String pluginVersion) {
-		return String.format("%s:%s", pluginName, pluginVersion);
+	@ManagedAttribute
+	public int getRegisteredReceiverPluginsCount() {
+		return receiverPlugins.size();
 	}
 
-	public Collection<PluginHandler> getRegisteredPlugins() {
-		return Collections.unmodifiableCollection(plugins.values());
+	static String pluginKey(final Class<?> pluginType, final String pluginName, final String pluginVersion) {
+		return String.format("%s:%s:%s", pluginType.getName(), pluginName, pluginVersion);
 	}
+
+	public Collection<PluginHandler> getRegisteredAircraftPlugins() {
+		return Collections.unmodifiableCollection(aircraftPlugins.values());
+	}
+
+	public Collection<PluginHandler> getRegisteredReceiverPlugins() {
+		return Collections.unmodifiableCollection(receiverPlugins.values());
+	}
+
 }

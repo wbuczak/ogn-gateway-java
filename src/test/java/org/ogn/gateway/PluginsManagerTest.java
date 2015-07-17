@@ -31,21 +31,25 @@ public class PluginsManagerTest {
 
 		pluginsManager.setConfig(conf);
 
-		assertEquals(0, pluginsManager.getRegisteredPluginsCount());
+		assertEquals(0, pluginsManager.getRegisteredAircraftPluginsCount());
 		pluginsManager.registerPlugins();
 		// call more times the same registration
 		pluginsManager.registerPlugins();
 		pluginsManager.registerPlugins();
 
-		// there should only be one plugin registered
-		assertEquals(1, pluginsManager.getRegisteredPluginsCount());
+		// there should only be 2 aircraft plugins registered
+		assertEquals(2, pluginsManager.getRegisteredAircraftPluginsCount());
+		// + 1 receiver plugin
+		assertEquals(1, pluginsManager.getRegisteredReceiverPluginsCount());
 
 		pluginsManager.init();
 
 		Thread.sleep(2500);
 
-		// there should only be one plugin registered
-		assertEquals(1, pluginsManager.getRegisteredPluginsCount());
+		// there should be 2 aircraft plugins registered
+		assertEquals(2, pluginsManager.getRegisteredAircraftPluginsCount());
+		// + 1 receiver plugin
+		assertEquals(1, pluginsManager.getRegisteredReceiverPluginsCount());
 
 		pluginsManager.stop();
 	}

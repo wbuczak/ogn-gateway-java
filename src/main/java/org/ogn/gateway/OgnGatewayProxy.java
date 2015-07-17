@@ -23,9 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * The <code>OgnGatewayProxy</code> service subscribes to the OGN
- * AircraftBeacons (through ogn-client-java) and registers plug-ins manager as a
- * listener of the AircraftBeacons. I also logs all received using IgcLogger
+ * The <code>OgnGatewayProxy</code> service subscribes to the OGN beacons
+ * (through ogn-client-java) and registers plug-ins manager as a listener of the
+ * AircraftBeacons and ReceiverBeacons. I also logs all received using IgcLogger
  * 
  * @author wbuczak
  */
@@ -64,12 +64,13 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 		client.unsubscribeFromAircraftBeacons(this);
 		client.unsubscribeFromReceiverBeacons(this);
 		client.disconnect();
+		pluginsManager.stop();
 	}
 
 	@Override
-	public void onUpdate(final AircraftBeacon beacon, final AircraftDescriptor descriptor, final String rawBeacon) {
+	public void onUpdate(final AircraftBeacon beacon, final AircraftDescriptor descriptor) {
 
-		LOG_AIR_RAW.info("{}", rawBeacon);
+		LOG_AIR_RAW.info("{}", beacon.getRawPacket());
 
 		if (LOG_AIR_DECODED.isInfoEnabled()) {
 			if (descriptor.isKnown())
@@ -92,8 +93,9 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 			// check also the descriptor - forward if either unknown or if known
 			// BUT! the tracking flag is ON
 			// (i.e. the person entering the record explicitly allowed tracking)
-			if (!descriptor.isKnown() || (descriptor.isKnown() && descriptor.isTracked()))
-				for (PluginHandler ph : pluginsManager.getRegisteredPlugins()) {
+			if (!descriptor.isKnown() || (descriptor.isKnown() && descriptor.isTracked())) {
+
+				for (PluginHandler ph : pluginsManager.getRegisteredAircraftPlugins()) {
 					OgnBeaconForwarder p = ph.getPlugin();
 
 					LOG_FORWARDED.info("{} {} {} {} {} {} {} ", beacon.isStealth(), descriptor.isTracked(), type,
@@ -104,10 +106,12 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 						// no need to wrap it in the try-catch - the call is
 						// just offering a beacon
 						// to the handler's queue
-						ph.onUpdate(beacon, descriptor, rawBeacon);
+						ph.onUpdate(beacon, descriptor);
 				}// for
-			else
+
+			} else {
 				discard = true;
+			}
 
 		}// if
 		else {
@@ -121,9 +125,23 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 	}
 
 	@Override
-	public void onUpdate(final ReceiverBeacon beacon, final String rawBeacon) {
+	public void onUpdate(final ReceiverBeacon beacon) {
 		// just log it
-		LOG_REC_RAW.info("{}", rawBeacon);
-		LOG_REC_DECODED.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
+		LOG_REC_RAW.info("{}", beacon.getRawPacket());
+
+		if (LOG_REC_DECODED.isInfoEnabled()) {
+			LOG_REC_DECODED.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
+		}
+
+		for (PluginHandler ph : pluginsManager.getRegisteredReceiverPlugins()) {
+			// OgnBeaconForwarder p = ph.getPlugin();
+			// System.out.println("XXXX");
+			if (!conf.isSimulationModeOn())
+
+				// no need to wrap it in the try-catch - the call is
+				// just offering a beacon
+				// to the handler's queue
+				ph.onUpdate(beacon);
+		}// for
 	}
 }

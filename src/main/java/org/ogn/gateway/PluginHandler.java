@@ -11,50 +11,46 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.ogn.client.AircraftBeaconListener;
+import org.ogn.client.ReceiverBeaconListener;
 import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftDescriptor;
-import org.ogn.commons.beacon.forwarder.OgnAircraftBeaconForwarder;
+import org.ogn.commons.beacon.ReceiverBeacon;
+import org.ogn.commons.beacon.forwarder.OgnBeaconForwarder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PluginHandler implements AircraftBeaconListener {
+public abstract class PluginHandler implements AircraftBeaconListener, ReceiverBeaconListener {
 
-	static Logger LOG = LoggerFactory.getLogger(PluginHandler.class);
+	protected static Logger LOG = LoggerFactory.getLogger(PluginHandler.class);
 
 	static class AircraftBeaconWithDescriptor {
 		AircraftBeacon beacon;
 		AircraftDescriptor descriptor;
-		String rawBeacon;
 
-		AircraftBeaconWithDescriptor(AircraftBeacon beacon, AircraftDescriptor descriptor, String rawBeacon) {
+		AircraftBeaconWithDescriptor(AircraftBeacon beacon, AircraftDescriptor descriptor) {
 			this.beacon = beacon;
 			this.descriptor = descriptor;
-			this.rawBeacon = rawBeacon;
 		}
 	}
 
-	private OgnAircraftBeaconForwarder plugin;
-
-	private BlockingQueue<AircraftBeaconWithDescriptor> beacons = new LinkedBlockingQueue<>();
+	private BlockingQueue<Object> beacons = new LinkedBlockingQueue<>();
 
 	private static ExecutorService executor;
 	private Future<?> queueConsumerFeature;
 
-	public PluginHandler(OgnAircraftBeaconForwarder plugin) {
+	protected OgnBeaconForwarder plugin;
+
+	public OgnBeaconForwarder getPlugin() {
+		return plugin;
+	}
+
+	protected <Plugin extends OgnBeaconForwarder> PluginHandler(Plugin plugin) {
 		this.plugin = plugin;
+
 		// share one executor across all handlers
 		if (executor == null) {
 			executor = Executors.newCachedThreadPool();
 		}
-	}
-
-	public OgnAircraftBeaconForwarder getPlugin() {
-		return this.plugin;
-	}
-
-	@Override
-	public void onUpdate(final AircraftBeacon beacon, final AircraftDescriptor descriptor, final String rawBeacon) {
-		beacons.offer(new AircraftBeaconWithDescriptor(beacon, descriptor, rawBeacon));
 	}
 
 	public void start() {
@@ -62,18 +58,26 @@ public class PluginHandler implements AircraftBeaconListener {
 			queueConsumerFeature = executor.submit(new Runnable() {
 				@Override
 				public void run() {
-					LOG.debug("starting plugin handler poller for plugin {}:{}", plugin.getName(), plugin.getVersion());
+
+					try {
+						plugin.init();
+					} catch (Exception ex) {
+						LOG.warn("exception caught when trying to initilize plugin: {}:{}:{}", plugin.getName(),
+								plugin.getVersion(), plugin.getDescription(), ex);
+					}
+
 					while (!Thread.interrupted()) {
-						AircraftBeaconWithDescriptor beacon;
+						Object obj = null;
 						try {
-							// get next beacon and proceed with sending it
-							beacon = beacons.take();
-							plugin.onBeacon(beacon.beacon, beacon.descriptor, beacon.rawBeacon);
+							obj = beacons.take();
 						} catch (InterruptedException e) {
 							LOG.warn("pugin-handler for pugin: {} - interrupted exception caught", plugin.getName());
 							Thread.currentThread().interrupt();
 							continue;
 						}
+
+						processValue(obj);
+
 					}// while
 
 				}
@@ -81,11 +85,23 @@ public class PluginHandler implements AircraftBeaconListener {
 		}
 	}
 
+	protected abstract void processValue(Object obj);
+
 	public void stop() {
 		if (plugin != null)
 			plugin.stop();
 
 		if (queueConsumerFeature != null)
 			queueConsumerFeature.cancel(true);
+	}
+
+	@Override
+	public void onUpdate(final AircraftBeacon beacon, final AircraftDescriptor descriptor) {
+		beacons.offer(new AircraftBeaconWithDescriptor(beacon, descriptor));
+	}
+
+	@Override
+	public void onUpdate(ReceiverBeacon beacon) {
+		beacons.offer(beacon);
 	}
 }
