@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 OGN, All Rights Reserved.
+* Copyright (c) 2014 OGN, All Rights Reserved.
  */
 
 package org.ogn.gateway;

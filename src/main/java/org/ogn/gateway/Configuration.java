@@ -7,9 +7,7 @@ package org.ogn.gateway;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.stereotype.Component;
 
-@Component
 @ManagedResource(objectName = "org.ogn.gateway:name=Config", description = "OGN gateway's configuration holder")
 public class Configuration {
 

@@ -7,12 +7,23 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<context:mbean-export registration="ignoreExisting" />
+    <context:mbean-export registration="ignoreExisting" />
+    
+    <bean id="config" class="org.ogn.gateway.Configuration" />
 
 	<!-- IGC logger works by default in a non-blocking (async) mode -->
-	<bean id="igcLogger" class="org.ogn.commons.igc.IgcLogger"
-		lazy-init="true">
-		<constructor-arg type="java.lang.String" value="#{configuration.igcFolder}" />
+	<bean id="igcLogger" class="org.ogn.commons.igc.IgcLogger" lazy-init="false">
+		<constructor-arg type="java.lang.String" value="#{config.igcFolder}" /> 
+	</bean>
+
+    <!--  mbean exported used for exporting POJOs as JMX beans (e.g. some beans from commons) -->
+	<bean class="org.springframework.jmx.export.MBeanExporter"
+		lazy-init="false">
+		<property name="beans">
+			<map>
+				<entry key="org.ogn.commons.igc:name=IgcLogger" value-ref="igcLogger" />
+			</map>
+		</property>
 	</bean>
 
 	<beans profile="PRO">
@@ -39,7 +50,12 @@
 			</constructor-arg>
 		</bean>
 
-		<context:component-scan base-package="org.ogn.gateway" />
+        <!--  scan for beans, but skip the plugins -->
+		<context:component-scan base-package="org.ogn.gateway">
+			<context:exclude-filter type="regex"
+				expression="org.ogn.gateway.plugin.*" />
+		</context:component-scan>
+		
 
 	</beans>
 
