@@ -76,7 +76,12 @@ public abstract class PluginHandler implements AircraftBeaconListener, ReceiverB
 							continue;
 						}
 
-						processValue(obj);
+						try {
+							processValue(obj);
+						} catch (Exception e) {
+							LOG.error("exception caught", e);
+							continue;
+						}
 
 					}// while
 
