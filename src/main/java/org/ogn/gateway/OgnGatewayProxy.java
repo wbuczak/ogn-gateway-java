@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2014 OGN, All Rights Reserved.
+ * Copyright (c) 2014 OGN, All Rights Reserved.
  */
 
 package org.ogn.gateway;
@@ -23,9 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * The <code>OgnGatewayProxy</code> service subscribes to the OGN beacons
- * (through ogn-client-java) and registers plug-ins manager as a listener of the
- * AircraftBeacons and ReceiverBeacons. I also logs all received using IgcLogger
+ * The <code>OgnGatewayProxy</code> service subscribes to the OGN beacons (through ogn-client-java) and registers
+ * plug-ins manager as a listener of the AircraftBeacons and ReceiverBeacons. I also logs all received using IgcLogger
  * 
  * @author wbuczak
  */
