@@ -171,8 +171,8 @@ public class PluginsManager {
 
 			// if not yet registered
 			if (!receiverPlugins.containsKey(md5key)) {
-				LOG.info("registering OgnReceiverBeaconForwarder plug-in: {} {} {} {}", bf.getClass().getName(),
-						bf.getName(), bf.getVersion(), bf.getDescription());
+				LOG.info("registering OgnReceiverBeaconForwarder plug-in: {} [ name: {}, version: {}, descr.: {} ]", bf
+						.getClass().getName(), bf.getName(), bf.getVersion(), bf.getDescription());
 
 				PluginHandler ph = new ReceiverPluginHandler(bf);
 				ph.start();
