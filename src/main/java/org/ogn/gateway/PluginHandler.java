@@ -13,6 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.ogn.client.AircraftBeaconListener;
 import org.ogn.client.ReceiverBeaconListener;
 import org.ogn.commons.beacon.AircraftBeacon;
+import org.ogn.commons.beacon.AircraftBeaconWithDescriptor;
 import org.ogn.commons.beacon.AircraftDescriptor;
 import org.ogn.commons.beacon.ReceiverBeacon;
 import org.ogn.commons.beacon.forwarder.OgnBeaconForwarder;
@@ -22,16 +23,6 @@ import org.slf4j.LoggerFactory;
 public abstract class PluginHandler implements AircraftBeaconListener, ReceiverBeaconListener {
 
 	protected static Logger LOG = LoggerFactory.getLogger(PluginHandler.class);
-
-	static class AircraftBeaconWithDescriptor {
-		AircraftBeacon beacon;
-		AircraftDescriptor descriptor;
-
-		AircraftBeaconWithDescriptor(AircraftBeacon beacon, AircraftDescriptor descriptor) {
-			this.beacon = beacon;
-			this.descriptor = descriptor;
-		}
-	}
 
 	private BlockingQueue<Object> beacons = new LinkedBlockingQueue<>();
 
@@ -83,7 +74,7 @@ public abstract class PluginHandler implements AircraftBeaconListener, ReceiverB
 							continue;
 						}
 
-					}// while
+					} // while
 
 				}
 			});
