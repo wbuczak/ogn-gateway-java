@@ -73,14 +73,16 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 
 		if (LOG_AIR_DECODED.isInfoEnabled()) {
 			if (descriptor.isKnown())
-				LOG_AIR_DECODED
-						.info("{} {} {}", beacon.getId(), JsonUtils.toJson(beacon), JsonUtils.toJson(descriptor));
+				LOG_AIR_DECODED.info("{} {} {}", beacon.getId(), JsonUtils.toJson(beacon),
+						JsonUtils.toJson(descriptor));
 			else
 				LOG_AIR_DECODED.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
 		}
 
-		// log to IGC file (non blocking operation)
-		igcLogger.log(beacon, descriptor);
+		if (conf.isIgcEnabled()) {
+			// log to IGC file (non blocking operation)
+			igcLogger.log(beacon, descriptor);
+		}
 
 		AddressType type = beacon.getAddressType();
 		boolean discard = false;
@@ -106,13 +108,13 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 						// just offering a beacon
 						// to the handler's queue
 						ph.onUpdate(beacon, descriptor);
-				}// for
+				} // for
 
 			} else {
 				discard = true;
 			}
 
-		}// if
+		} // if
 		else {
 			discard = true;
 		}
@@ -141,6 +143,6 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 				// just offering a beacon
 				// to the handler's queue
 				ph.onUpdate(beacon);
-		}// for
+		} // for
 	}
 }

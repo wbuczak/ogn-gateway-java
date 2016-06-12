@@ -16,6 +16,9 @@ public class Configuration {
 
 	@Value("${ogn.gateway.igc.folder:log/igc}")
 	private String igcFolder;
+	
+	@Value("${ogn.gateway.igc.enabled:true}")
+	private boolean igcEnabled;
 
 	@Value("${ogn.gateway.plugins.scanning_interval:30000}")
 	private int scanningIntervalMs;
@@ -47,6 +50,11 @@ public class Configuration {
 	@ManagedAttribute
 	public boolean isSimulationModeOn() {
 		return simulationMode;
+	}
+	
+	@ManagedAttribute
+	public boolean isIgcEnabled() {
+		return igcEnabled;
 	}
 
 	@ManagedAttribute
