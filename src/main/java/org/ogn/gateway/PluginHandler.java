@@ -4,6 +4,7 @@
 
 package org.ogn.gateway;
 
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,14 +23,14 @@ import org.slf4j.LoggerFactory;
 
 public abstract class PluginHandler implements AircraftBeaconListener, ReceiverBeaconListener {
 
-	protected static Logger LOG = LoggerFactory.getLogger(PluginHandler.class);
+	protected static Logger			LOG		= LoggerFactory.getLogger(PluginHandler.class);
 
-	private BlockingQueue<Object> beacons = new LinkedBlockingQueue<>();
+	private BlockingQueue<Object>	beacons	= new LinkedBlockingQueue<>();
 
-	private static ExecutorService executor;
-	private Future<?> queueConsumerFeature;
+	private static ExecutorService	executor;
+	private Future<?>				queueConsumerFeature;
 
-	protected OgnBeaconForwarder plugin;
+	protected OgnBeaconForwarder	plugin;
 
 	public OgnBeaconForwarder getPlugin() {
 		return plugin;
@@ -92,8 +93,8 @@ public abstract class PluginHandler implements AircraftBeaconListener, ReceiverB
 	}
 
 	@Override
-	public void onUpdate(final AircraftBeacon beacon, final AircraftDescriptor descriptor) {
-		beacons.offer(new AircraftBeaconWithDescriptor(beacon, descriptor));
+	public void onUpdate(final AircraftBeacon beacon, final Optional<AircraftDescriptor> descriptor) {
+		beacons.offer(new AircraftBeaconWithDescriptor(beacon, descriptor.isPresent() ? descriptor.get() : null));
 	}
 
 	@Override

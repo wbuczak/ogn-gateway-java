@@ -8,7 +8,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
 		<org.springframework.version>4.1.4.RELEASE</org.springframework.version>
 		<hazelcast.version>3.3</hazelcast.version>
 	</properties>
@@ -95,17 +94,17 @@
 		<!-- <artifactId>hazelcast-all</artifactId> -->
 		<!-- <version>${hazelcast.version}</version> -->
 		<!-- </dependency> -->
-		
-				<dependency>
+
+		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
-			<version>1.4</version>	
-<!-- 			<exclusions> -->
-<!-- 			  <exclusion> -->
-<!-- 			     <groupId>commons-pool</groupId> -->
-<!-- 			     <artifactId>commons-pool</artifactId> -->
-<!-- 			  </exclusion> -->
-<!-- 			</exclusions>		 -->
+			<version>1.4</version>
+			<!-- <exclusions> -->
+			<!-- <exclusion> -->
+			<!-- <groupId>commons-pool</groupId> -->
+			<!-- <artifactId>commons-pool</artifactId> -->
+			<!-- </exclusion> -->
+			<!-- </exclusions> -->
 		</dependency>
 
 		<dependency>

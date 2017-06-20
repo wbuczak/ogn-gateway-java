@@ -4,6 +4,8 @@
 
 package org.ogn.gateway;
 
+import java.util.Optional;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -32,25 +34,25 @@ import org.springframework.stereotype.Service;
 public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconListener {
 
 	@Autowired
-	private PluginsManager pluginsManager;
+	private PluginsManager	pluginsManager;
 
 	@Autowired
-	private OgnClient client;
+	private OgnClient		client;
 
 	@Autowired
-	IgcLogger igcLogger;
+	IgcLogger				igcLogger;
 
 	@Autowired
-	Configuration conf;
+	Configuration			conf;
 
-	static Logger LOG_FORWARDED = LoggerFactory.getLogger("OgnGatewayProxyForwardedLog");
-	static Logger LOG_DISCARDED = LoggerFactory.getLogger("OgnGatewayProxyDiscardedLog");
+	static Logger			LOG_FORWARDED	= LoggerFactory.getLogger("OgnGatewayProxyForwardedLog");
+	static Logger			LOG_DISCARDED	= LoggerFactory.getLogger("OgnGatewayProxyDiscardedLog");
 
-	static Logger LOG_AIR_RAW = LoggerFactory.getLogger("RawAircraftBeaconsLog");
-	static Logger LOG_AIR_DECODED = LoggerFactory.getLogger("DecodedAircraftBeaconsLog");
+	static Logger			LOG_AIR_RAW		= LoggerFactory.getLogger("RawAircraftBeaconsLog");
+	static Logger			LOG_AIR_DECODED	= LoggerFactory.getLogger("DecodedAircraftBeaconsLog");
 
-	static Logger LOG_REC_RAW = LoggerFactory.getLogger("RawReceiverBeaconsLog");
-	static Logger LOG_REC_DECODED = LoggerFactory.getLogger("DecodedReceiverBeaconsLog");
+	static Logger			LOG_REC_RAW		= LoggerFactory.getLogger("RawReceiverBeaconsLog");
+	static Logger			LOG_REC_DECODED	= LoggerFactory.getLogger("DecodedReceiverBeaconsLog");
 
 	@PostConstruct
 	public void init() {
@@ -67,14 +69,14 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 	}
 
 	@Override
-	public void onUpdate(final AircraftBeacon beacon, final AircraftDescriptor descriptor) {
+	public void onUpdate(final AircraftBeacon beacon, final Optional<AircraftDescriptor> descriptor) {
 
 		LOG_AIR_RAW.info("{}", beacon.getRawPacket());
 
 		if (LOG_AIR_DECODED.isInfoEnabled()) {
-			if (descriptor.isKnown())
+			if (descriptor.isPresent())
 				LOG_AIR_DECODED.info("{} {} {}", beacon.getId(), JsonUtils.toJson(beacon),
-						JsonUtils.toJson(descriptor));
+						JsonUtils.toJson(descriptor.get()));
 			else
 				LOG_AIR_DECODED.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
 		}
@@ -94,12 +96,12 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 			// check also the descriptor - forward if either unknown or if known
 			// BUT! the tracking flag is ON
 			// (i.e. the person entering the record explicitly allowed tracking)
-			if (!descriptor.isKnown() || (descriptor.isKnown() && descriptor.isTracked())) {
+			if (!descriptor.isPresent() || descriptor.get().isTracked()) {
 
 				for (PluginHandler ph : pluginsManager.getRegisteredAircraftPlugins()) {
 					OgnBeaconForwarder p = ph.getPlugin();
 
-					LOG_FORWARDED.info("{} {} {} {} {} {} {} ", beacon.isStealth(), descriptor.isTracked(), type,
+					LOG_FORWARDED.info("{} {} {} {} {} {} {} ", beacon.isStealth(), getTrackedFlag(descriptor), type,
 							beacon.getErrorCount(), p.getName(), p.getVersion(), beacon.getRawPacket());
 
 					if (!conf.isSimulationModeOn())
@@ -120,9 +122,13 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 		}
 
 		if (discard)
-			LOG_DISCARDED.info("{} {} {} {} {}", beacon.isStealth(), descriptor.isTracked(), type,
+			LOG_DISCARDED.info("{} {} {} {} {}", beacon.isStealth(), getTrackedFlag(descriptor), type,
 					beacon.getErrorCount(), beacon.getRawPacket());
 
+	}
+
+	private static String getTrackedFlag(Optional<AircraftDescriptor> descriptor) {
+		return descriptor.isPresent() ? Boolean.toString(descriptor.get().isTracked()) : "?";
 	}
 
 	@Override
