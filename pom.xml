@@ -4,12 +4,13 @@
 	<groupId>org.ogn</groupId>
 	<artifactId>ogn-gateway-java</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
+	<name>OGN gateway</name>
 	<description>The OGN gateway forwards OGN aircraft beacons to different systems (e.g. cunimb.fr, FR24) All specific forwarders are implemented as plugins, automatically detected and registered (once put in a plugins folder)</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<org.springframework.version>4.1.4.RELEASE</org.springframework.version>
-		<hazelcast.version>3.3</hazelcast.version>
+		<docker.image.prefix>dockerogn</docker.image.prefix>
 	</properties>
 
 	<dependencies>
@@ -48,11 +49,11 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.5.1</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.fasterxml.jackson.core</groupId> -->
+<!-- 			<artifactId>jackson-databind</artifactId> -->
+<!-- 			<version>2.5.1</version> -->
+<!-- 		</dependency> -->
 
 		<!-- SPRING libraries -->
 		<dependency>
@@ -88,23 +89,10 @@
 		</dependency>
 		<!-- END SPRING libraries -->
 
-		<!-- Hazelcast clustering -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.hazelcast</groupId> -->
-		<!-- <artifactId>hazelcast-all</artifactId> -->
-		<!-- <version>${hazelcast.version}</version> -->
-		<!-- </dependency> -->
-
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
 			<version>1.4</version>
-			<!-- <exclusions> -->
-			<!-- <exclusion> -->
-			<!-- <groupId>commons-pool</groupId> -->
-			<!-- <artifactId>commons-pool</artifactId> -->
-			<!-- </exclusion> -->
-			<!-- </exclusions> -->
 		</dependency>
 
 		<dependency>
@@ -169,4 +157,80 @@
 
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>docker</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+
+			<build>
+				<plugins>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.0.2</version>
+						<executions>
+							<execution>
+								<id>copy-docker-files</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<resources>
+										<resource>
+											<filtering>true</filtering>
+											<directory>src/main/docker</directory>
+											<includes>
+												<include>*</include>
+											</includes>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>com.spotify</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+						<version>1.0.0</version>
+						<configuration>
+							<imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+							<dockerDirectory>${project.build.directory}</dockerDirectory>
+							<imageTags>
+								<imageTag>${project.version}</imageTag>
+							</imageTags>
+						</configuration>
+						<executions>
+							<execution>
+								<id>docker-build</id>
+								<phase>install</phase>
+								<goals>
+									<goal>build</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>docker-push</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>push</goal>
+								</goals>
+								<configuration>
+									<serverId>docker-dockerhub</serverId>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+				</plugins>
+			</build>
+
+		</profile>
+	</profiles>
+
 </project>
