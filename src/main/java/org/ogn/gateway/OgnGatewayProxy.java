@@ -45,14 +45,14 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 	@Autowired
 	Configuration			conf;
 
-	static Logger			LOG_FORWARDED	= LoggerFactory.getLogger("OgnGatewayProxyForwardedLog");
-	static Logger			LOG_DISCARDED	= LoggerFactory.getLogger("OgnGatewayProxyDiscardedLog");
+	static final Logger		LOG_FORWARDED	= LoggerFactory.getLogger("OgnGatewayProxyForwardedLog");
+	static final Logger		LOG_DISCARDED	= LoggerFactory.getLogger("OgnGatewayProxyDiscardedLog");
 
-	static Logger			LOG_AIR_RAW		= LoggerFactory.getLogger("RawAircraftBeaconsLog");
-	static Logger			LOG_AIR_DECODED	= LoggerFactory.getLogger("DecodedAircraftBeaconsLog");
+	static final Logger		LOG_AIR_RAW		= LoggerFactory.getLogger("RawAircraftBeaconsLog");
+	static final Logger		LOG_AIR_DECODED	= LoggerFactory.getLogger("DecodedAircraftBeaconsLog");
 
-	static Logger			LOG_REC_RAW		= LoggerFactory.getLogger("RawReceiverBeaconsLog");
-	static Logger			LOG_REC_DECODED	= LoggerFactory.getLogger("DecodedReceiverBeaconsLog");
+	static final Logger		LOG_REC_RAW		= LoggerFactory.getLogger("RawReceiverBeaconsLog");
+	static final Logger		LOG_REC_DECODED	= LoggerFactory.getLogger("DecodedReceiverBeaconsLog");
 
 	@PostConstruct
 	public void init() {
@@ -86,7 +86,7 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 			igcLogger.log(beacon, descriptor);
 		}
 
-		AddressType type = beacon.getAddressType();
+		final AddressType type = beacon.getAddressType();
 		boolean discard = false;
 
 		// notify forwarders if certain condition is met
@@ -98,8 +98,8 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 			// (i.e. the person entering the record explicitly allowed tracking)
 			if (!descriptor.isPresent() || descriptor.get().isTracked()) {
 
-				for (PluginHandler ph : pluginsManager.getRegisteredAircraftPlugins()) {
-					OgnBeaconForwarder p = ph.getPlugin();
+				for (final PluginHandler ph : pluginsManager.getRegisteredAircraftPlugins()) {
+					final OgnBeaconForwarder p = ph.getPlugin();
 
 					LOG_FORWARDED.info("{} {} {} {} {} {} {} ", beacon.isStealth(), getTrackedFlag(descriptor), type,
 							beacon.getErrorCount(), p.getName(), p.getVersion(), beacon.getRawPacket());
@@ -140,7 +140,7 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 			LOG_REC_DECODED.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
 		}
 
-		for (PluginHandler ph : pluginsManager.getRegisteredReceiverPlugins()) {
+		for (final PluginHandler ph : pluginsManager.getRegisteredReceiverPlugins()) {
 			// OgnBeaconForwarder p = ph.getPlugin();
 			// System.out.println("XXXX");
 			if (!conf.isSimulationModeOn())
