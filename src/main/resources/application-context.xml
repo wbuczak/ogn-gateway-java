@@ -9,7 +9,7 @@
 
     <context:mbean-export registration="ignoreExisting" />
     
-    <bean id="config" class="org.ogn.gateway.Configuration" />
+    <bean id="config" class="org.ogn.gateway.Configuration" lazy-init="false"/>
 
 	<!-- IGC logger works by default in a non-blocking (async) mode -->
 	<bean id="igcLogger" class="org.ogn.commons.igc.IgcLogger" lazy-init="false">
