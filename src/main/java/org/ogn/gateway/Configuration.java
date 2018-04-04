@@ -12,25 +12,25 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 public class Configuration {
 
 	@Value("${ogn.gateway.plugins.folder:plugins}")
-	private String pluginsFolder;
+	private String	pluginsFolder;
 
 	@Value("${ogn.gateway.igc.folder:log/igc}")
-	private String igcFolder;
-	
+	private String	igcFolder;
+
 	@Value("${ogn.gateway.igc.enabled:true}")
-	private boolean igcEnabled;
+	private boolean	igcEnabled;
 
 	@Value("${ogn.gateway.plugins.scanning_interval:30000}")
-	private int scanningIntervalMs;
+	private int		scanningIntervalMs;
 
 	@Value("${ogn.gateway.max_packet_errors:5}")
-	private int maxPacketErrors;
+	private int		maxPacketErrors;
 
 	@Value("${ogn.gateway.simulation:false}")
-	private boolean simulationMode;
+	private boolean	simulationMode;
 
 	@Value("${ogn.gateway.enable_clustering:false}")
-	private boolean clusteringEnabled;
+	private boolean	clusteringEnabled;
 
 	@ManagedAttribute
 	public String getPluginsFolderName() {
@@ -51,7 +51,7 @@ public class Configuration {
 	public boolean isSimulationModeOn() {
 		return simulationMode;
 	}
-	
+
 	@ManagedAttribute
 	public boolean isIgcEnabled() {
 		return igcEnabled;
