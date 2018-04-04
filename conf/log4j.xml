@@ -33,7 +33,7 @@
 
 	<appender name="OgnGatewayProxyForwardedAppender" class="org.apache.log4j.RollingFileAppender">
 		<param name="Append" value="true" />
-		<param name="File" value="${process.log.path}/proxy-forwarded.log" />
+		<param name="File" value="${process.log.path}/forwarded.log" />
 		<param name="MaxFileSize" value="5MB" />
 		<param name="MaxBackupIndex" value="2" />
 		<layout class="org.apache.log4j.PatternLayout">
@@ -42,7 +42,7 @@
 	</appender>
 
 	<appender name="OgnGatewayProxyDiscardedAppender" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="${process.log.path}/proxy-discarded.log" />
+		<param name="File" value="${process.log.path}/discarded.log" />
 		<param name="DatePattern" value="'.'yyyy-MM-dd" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
