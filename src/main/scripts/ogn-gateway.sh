@@ -18,7 +18,11 @@ fi
 PROCESS_NAME=ogn-gateway
 
 OGN_GATEWAY_CON_DIR=${OGN_GATEWAY_HOME}/conf
-OGN_GATEWAY_LOG_DIR=${OGN_GATEWAY_HOME}/log
+
+if [ -z ${OGN_GATEWAY_LOG_DIR} ]; then
+  OGN_GATEWAY_LOG_DIR=${OGN_GATEWAY_HOME}/log
+fi
+
 OGN_GATEWAY_LIB_DIR=${OGN_GATEWAY_HOME}/lib
 OGN_GATEWAY_TMP_DIR=${OGN_GATEWAY_HOME}/tmp
 
@@ -40,7 +44,15 @@ OGN_GATEWAY_DOMAIN=`hostname -d`
 #DEBUG_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=5000,server=y,suspend=n"
 
 # options used to enable remote JMX management
-JCONSOLE_REMOTE="-Dcom.sun.management.jmxremote.port=${OGN_GATEWAY_JMX_PORT} -Dcom.sun.management.jmxremote.authenticate=true -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.password.file=conf/jmxremote.passwd -Dcom.sun.management.jmxremote.access.file=conf/jmxremote.access"
+JCONSOLE_REMOTE="-Dcom.sun.management.jmxremote.port=${OGN_GATEWAY_JMX_PORT} \
+  -Dcom.sun.management.jmxremote.authenticate=true \
+  -Dcom.sun.management.jmxremote.ssl=false \
+  -Dcom.sun.management.jmxremote.password.file=conf/jmxremote.passwd \
+  -Dcom.sun.management.jmxremote.access.file=conf/jmxremote.access \
+  -Dcom.sun.management.jmxremote.local.only=false \
+  -Dcom.sun.management.jmxremote.rmi.port=${OGN_GATEWAY_JMX_PORT} \
+  -Djava.rmi.server.hostname=0.0.0.0"
+
 
 # uncomment and update accordingly if you need to tune ogn-client connection
 #APRS_OPTS="-Dogn.server.name=52.16.247.84"
@@ -54,7 +66,11 @@ PROCESS_COMMAND=$1
 PID_FILE=${OGN_GATEWAY_TMP_DIR}/ogn-gateway.pid
 
 # Make sure the JAVA_BIN variable points to the java bin directory on your machine
-JAVA_BIN=/usr/bin/java
+if [ ! -z ${JAVA_HOME} ]; then
+  JAVA_BIN=${JAVA_HOME}/bin/java
+else
+  JAVA_BIN=/usr/bin/java
+fi
 
 #JVM_OPTS="-Xms256m -Xmx256m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100"
 JVM_OPTS="-Xms256m -Xmx256m"
