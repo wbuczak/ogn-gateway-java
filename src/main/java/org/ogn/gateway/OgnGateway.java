@@ -11,10 +11,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class OgnGateway {
 
-	static Logger LOG = LoggerFactory.getLogger(OgnGateway.class);
+	private static final Logger LOG = LoggerFactory.getLogger(OgnGateway.class);
 
 	private static void configureLogging() {
-		String log4jConf = System.getProperty("log4j.configuration");
+		final String log4jConf = System.getProperty("log4j.configuration");
 
 		if (log4jConf != null)
 			try {
@@ -22,7 +22,7 @@ public class OgnGateway {
 				// does not yet provide
 				// watch-dog functionality - so we have to use log4j directly
 				DOMConfigurator.configureAndWatch(System.getProperty("log4j.configuration"), 30 * 1000);
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				System.err.println("Unable to load log4j configuration file : " + ex.getMessage());
 				ex.printStackTrace();
 			}
@@ -32,12 +32,13 @@ public class OgnGateway {
 		configureLogging();
 		LOG.info("starting OGN gateway process");
 		@SuppressWarnings("resource")
-		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:application-context.xml");
+		final ClassPathXmlApplicationContext ctx =
+				new ClassPathXmlApplicationContext("classpath:application-context.xml");
 		ctx.getEnvironment().setDefaultProfiles("PRO");
 		// ctx.getEnvironment().setActiveProfiles("TEST");
 		ctx.refresh();
 
-		Configuration conf = ctx.getBean(Configuration.class);
+		final Configuration conf = ctx.getBean(Configuration.class);
 		LOG.info("simulation mode: {}", conf.isSimulationModeOn());
 	}
 }

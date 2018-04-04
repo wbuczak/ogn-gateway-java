@@ -23,62 +23,57 @@ import org.slf4j.LoggerFactory;
 
 public abstract class PluginHandler implements AircraftBeaconListener, ReceiverBeaconListener {
 
-	protected static Logger			LOG		= LoggerFactory.getLogger(PluginHandler.class);
+	protected static final Logger		LOG			= LoggerFactory.getLogger(PluginHandler.class);
 
-	private BlockingQueue<Object>	beacons	= new LinkedBlockingQueue<>();
+	private static ExecutorService		executor	= Executors.newCachedThreadPool();
 
-	private static ExecutorService	executor;
-	private Future<?>				queueConsumerFeature;
+	private final BlockingQueue<Object>	beacons		= new LinkedBlockingQueue<>();
 
-	protected OgnBeaconForwarder	plugin;
+	private Future<?>					queueConsumerFeature;
+
+	protected OgnBeaconForwarder		plugin;
 
 	public OgnBeaconForwarder getPlugin() {
 		return plugin;
 	}
 
-	protected <Plugin extends OgnBeaconForwarder> PluginHandler(Plugin plugin) {
+	protected <P extends OgnBeaconForwarder> PluginHandler(P plugin) {
 		this.plugin = plugin;
-
-		// share one executor across all handlers
-		if (executor == null) {
-			executor = Executors.newCachedThreadPool();
-		}
 	}
 
 	public void start() {
 		if (queueConsumerFeature == null) {
-			queueConsumerFeature = executor.submit(new Runnable() {
-				@Override
-				public void run() {
+			queueConsumerFeature = executor.submit(() -> {
 
+				try {
+					plugin.init();
+				} catch (final Exception ex) {
+					LOG.warn("exception caught when trying to initilize plugin: {}:{}:{}", plugin.getName(),
+							plugin.getVersion(), plugin.getDescription(), ex);
+				}
+
+				while (!Thread.interrupted()) {
+					Object obj = null;
 					try {
-						plugin.init();
-					} catch (Exception ex) {
-						LOG.warn("exception caught when trying to initilize plugin: {}:{}:{}", plugin.getName(),
-								plugin.getVersion(), plugin.getDescription(), ex);
+						obj = beacons.take();
+					} catch (final InterruptedException e) {
+						LOG.warn("pugin-handler for pugin: {} - interrupted exception caught", plugin.getName());
+						Thread.currentThread().interrupt();
+						continue;
 					}
 
-					while (!Thread.interrupted()) {
-						Object obj = null;
-						try {
-							obj = beacons.take();
-						} catch (InterruptedException e) {
-							LOG.warn("pugin-handler for pugin: {} - interrupted exception caught", plugin.getName());
-							Thread.currentThread().interrupt();
-							continue;
-						}
+					try {
+						processValue(obj);
+					} catch (final Exception e) {
+						LOG.error("exception caught", e);
+						continue;
+					}
 
-						try {
-							processValue(obj);
-						} catch (Exception e) {
-							LOG.error("exception caught", e);
-							continue;
-						}
+				} // while
 
-					} // while
+			}
 
-				}
-			});
+			);
 		}
 	}
 
@@ -94,7 +89,7 @@ public abstract class PluginHandler implements AircraftBeaconListener, ReceiverB
 
 	@Override
 	public void onUpdate(final AircraftBeacon beacon, final Optional<AircraftDescriptor> descriptor) {
-		beacons.offer(new AircraftBeaconWithDescriptor(beacon, descriptor.isPresent() ? descriptor.get() : null));
+		beacons.offer(new AircraftBeaconWithDescriptor(beacon, descriptor));
 	}
 
 	@Override

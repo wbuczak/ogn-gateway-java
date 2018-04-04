@@ -5,7 +5,6 @@
 package org.ogn.gateway;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -47,18 +46,18 @@ import org.springframework.stereotype.Service;
 @ManagedResource(objectName = "org.ogn.gateway:name=PluginsManager", description = "OGN gateway's plugins manager")
 public class PluginsManager {
 
-	static Logger LOG = LoggerFactory.getLogger(PluginsManager.class);
+	static Logger										LOG				= LoggerFactory.getLogger(PluginsManager.class);
 
-	Configuration conf;
+	Configuration										conf;
 
-	private ConcurrentMap<String, PluginHandler> aircraftPlugins = new ConcurrentHashMap<>();
-	private ConcurrentMap<String, PluginHandler> receiverPlugins = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, PluginHandler>	aircraftPlugins	= new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, PluginHandler>	receiverPlugins	= new ConcurrentHashMap<>();
 
-	private ScheduledExecutorService scheduledExecutor;
+	private final ScheduledExecutorService				scheduledExecutor;
 
-	private volatile Future<?> pluginsRegistrationFuture;
+	private volatile Future<?>							pluginsRegistrationFuture;
 
-	private Set<URL> pluginJars = new HashSet<>();
+	private final Set<URL>								pluginJars		= new HashSet<>();
 
 	public PluginsManager() {
 		scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -77,11 +76,11 @@ public class PluginsManager {
 
 	@PreDestroy
 	public void preDestroy() {
-		for (PluginHandler ph : getRegisteredAircraftPlugins()) {
+		for (final PluginHandler ph : getRegisteredAircraftPlugins()) {
 			ph.stop();
 		}
 
-		for (PluginHandler ph : getRegisteredReceiverPlugins()) {
+		for (final PluginHandler ph : getRegisteredReceiverPlugins()) {
 			ph.stop();
 		}
 	}
@@ -95,34 +94,28 @@ public class PluginsManager {
 
 	private void startPluginsRegistrationJob() {
 		if (pluginsRegistrationFuture == null || pluginsRegistrationFuture.isCancelled()) {
-			pluginsRegistrationFuture = scheduledExecutor.scheduleAtFixedRate(new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						registerPlugins();
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
+			pluginsRegistrationFuture = scheduledExecutor.scheduleAtFixedRate(() -> {
+				try {
+					registerPlugins();
+				} catch (final Exception ex) {
+					ex.printStackTrace();
 				}
 			}, 0, conf.getScanningInterval(), TimeUnit.MILLISECONDS);
 		}
+
 	}
 
 	synchronized void registerPlugins() {
-		File loc = new File(conf.getPluginsFolderName());
+		final File loc = new File(conf.getPluginsFolderName());
 
-		File[] flist = loc.listFiles(new FileFilter() {
-			@Override
-			public boolean accept(File file) {
-				return file.getPath().toLowerCase().endsWith(".jar");
-			}
+		final File[] flist = loc.listFiles(f -> {
+			return f.getPath().toLowerCase().endsWith(".jar");
 		});
 
-		List<URL> urls = new ArrayList<>();
+		final List<URL> urls = new ArrayList<>();
 		for (int i = 0; i < flist.length; i++)
 			try {
-				URL jar = flist[i].toURI().toURL();
+				final URL jar = flist[i].toURI().toURL();
 				if (!pluginJars.contains(jar)) {
 					urls.add(jar);
 					pluginJars.add(jar);
@@ -130,7 +123,7 @@ public class PluginsManager {
 					// add the jar to the system classpath! (if not yet added)
 					addURL(jar);
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				LOG.error("failed to register plug-in", e);
 			}
 
@@ -138,47 +131,49 @@ public class PluginsManager {
 		if (urls.isEmpty())
 			return;
 
-		URLClassLoader ucl = new URLClassLoader(urls.toArray(new URL[0]));
-		ServiceLoader<OgnAircraftBeaconForwarder> aLoader = ServiceLoader.load(OgnAircraftBeaconForwarder.class, ucl);
-		ServiceLoader<OgnReceiverBeaconForwarder> rLoader = ServiceLoader.load(OgnReceiverBeaconForwarder.class, ucl);
-		Iterator<OgnAircraftBeaconForwarder> aIt = aLoader.iterator();
-		Iterator<OgnReceiverBeaconForwarder> rIt = rLoader.iterator();
+		final URLClassLoader ucl = new URLClassLoader(urls.toArray(new URL[0]));
+		final ServiceLoader<OgnAircraftBeaconForwarder> aLoader =
+				ServiceLoader.load(OgnAircraftBeaconForwarder.class, ucl);
+		final ServiceLoader<OgnReceiverBeaconForwarder> rLoader =
+				ServiceLoader.load(OgnReceiverBeaconForwarder.class, ucl);
+		final Iterator<OgnAircraftBeaconForwarder> aIt = aLoader.iterator();
+		final Iterator<OgnReceiverBeaconForwarder> rIt = rLoader.iterator();
 
 		while (aIt.hasNext()) {
-			OgnAircraftBeaconForwarder bf = aIt.next();
+			final OgnAircraftBeaconForwarder bf = aIt.next();
 
 			LOG.info("loading plug-in: {}", bf.getClass().getName());
-			String key = pluginKey(OgnAircraftBeaconForwarder.class, bf.getName(), bf.getVersion());
-			String md5key = StringUtils.md5(key);
+			final String key = pluginKey(OgnAircraftBeaconForwarder.class, bf.getName(), bf.getVersion());
+			final String md5key = StringUtils.md5(key);
 
 			// if not yet registered
 			if (!aircraftPlugins.containsKey(md5key)) {
-				LOG.info("registering OgnAircraftBeaconForwarder plug-in: {} [ name: {}, version: {}, descr.: {} ]", bf
-						.getClass().getName(), bf.getName(), bf.getVersion(), bf.getDescription());
+				LOG.info("registering OgnAircraftBeaconForwarder plug-in: {} [ name: {}, version: {}, descr.: {} ]",
+						bf.getClass().getName(), bf.getName(), bf.getVersion(), bf.getDescription());
 
-				PluginHandler ph = new AircraftPluginHandler(bf);
+				final PluginHandler ph = new AircraftPluginHandler(bf);
 				ph.start();
 				aircraftPlugins.putIfAbsent(md5key, ph);
-			}// if
-		}// while
+			} // if
+		} // while
 
 		while (rIt.hasNext()) {
-			OgnReceiverBeaconForwarder bf = rIt.next();
+			final OgnReceiverBeaconForwarder bf = rIt.next();
 
 			LOG.trace("loading plug-in: {}", bf.getClass().getName());
-			String key = pluginKey(OgnReceiverBeaconForwarder.class, bf.getName(), bf.getVersion());
-			String md5key = StringUtils.md5(key);
+			final String key = pluginKey(OgnReceiverBeaconForwarder.class, bf.getName(), bf.getVersion());
+			final String md5key = StringUtils.md5(key);
 
 			// if not yet registered
 			if (!receiverPlugins.containsKey(md5key)) {
-				LOG.info("registering OgnReceiverBeaconForwarder plug-in: {} [ name: {}, version: {}, descr.: {} ]", bf
-						.getClass().getName(), bf.getName(), bf.getVersion(), bf.getDescription());
+				LOG.info("registering OgnReceiverBeaconForwarder plug-in: {} [ name: {}, version: {}, descr.: {} ]",
+						bf.getClass().getName(), bf.getName(), bf.getVersion(), bf.getDescription());
 
-				PluginHandler ph = new ReceiverPluginHandler(bf);
+				final PluginHandler ph = new ReceiverPluginHandler(bf);
 				ph.start();
 				receiverPlugins.putIfAbsent(md5key, ph);
-			}// if
-		}// while
+			} // if
+		} // while
 
 	}
 
@@ -205,17 +200,17 @@ public class PluginsManager {
 	}
 
 	public static void addURL(URL u) throws IOException {
-		final Class<?>[] parameters = new Class[] { URL.class };
-		URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-		Class<URLClassLoader> sysclass = URLClassLoader.class;
+		final Class<?>[] parameters = new Class[]{URL.class};
+		final URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+		final Class<URLClassLoader> sysclass = URLClassLoader.class;
 
 		try {
-			Method method = sysclass.getDeclaredMethod("addURL", parameters);
+			final Method method = sysclass.getDeclaredMethod("addURL", parameters);
 			method.setAccessible(true);
-			method.invoke(sysloader, new Object[] { u });
-		} catch (Throwable t) {
-			t.printStackTrace();
-			throw new IOException("Error, could not add URL to system classloader");
+			method.invoke(sysloader, new Object[]{u});
+		} catch (final Exception e) {
+			e.printStackTrace();
+			throw new IOException("Error, could not add URL to system classloader", e);
 		}
 
 	}
