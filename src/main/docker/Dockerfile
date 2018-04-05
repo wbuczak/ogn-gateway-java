@@ -27,7 +27,5 @@ RUN echo -e \
     chmod 600 conf/jmxremote.* && \
     chmod 600 conf/log4j.xml
            
-
-#RUN chmod +rx /opt/vc/${project.artifactId}/bin/docker-entrypoint.sh
-#ENTRYPOINT ["/bin/bash","/opt/ogn/ogn-gateway/ogn-gateway.sh"]
-#CMD ["start"]
+CMD /opt/ogn/ogn-gateway/ogn-gateway.sh start && \
+    /bin/bash    
