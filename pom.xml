@@ -10,7 +10,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<org.springframework.version>4.1.4.RELEASE</org.springframework.version>
-		<docker.image.prefix>dockerogn</docker.image.prefix>
+		<docker.image.prefix>ogndocker</docker.image.prefix>
 	</properties>
 
 	<dependencies>
