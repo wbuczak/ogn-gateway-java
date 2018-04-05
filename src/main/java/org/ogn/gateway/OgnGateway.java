@@ -18,9 +18,7 @@ public class OgnGateway {
 
 		if (log4jConf != null)
 			try {
-				// Load the log4j configuration - unfortunately pure SLF4J API
-				// does not yet provide
-				// watch-dog functionality - so we have to use log4j directly
+				// Load the log4j configuration and create conf file watch-dog
 				DOMConfigurator.configureAndWatch(System.getProperty("log4j.configuration"), 30 * 1000);
 			} catch (final Exception ex) {
 				System.err.println("Unable to load log4j configuration file : " + ex.getMessage());
@@ -39,6 +37,6 @@ public class OgnGateway {
 		ctx.refresh();
 
 		final Configuration conf = ctx.getBean(Configuration.class);
-		LOG.info("simulation mode: {}", conf.isSimulationModeOn());
+		LOG.info("simulation mode: {}", conf.isSimulationModeOn() ? "ON" : "OFF");
 	}
 }

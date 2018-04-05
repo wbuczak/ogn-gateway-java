@@ -7,23 +7,23 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:mbean-export registration="ignoreExisting" />
+    <context:mbean-export registration="ignoreExisting" /> 
     
-    <bean id="config" class="org.ogn.gateway.Configuration" lazy-init="false"/>
-
-	<!-- IGC logger works by default in a non-blocking (async) mode -->
-	<bean id="igcLogger" class="org.ogn.commons.igc.IgcLogger" lazy-init="false">
-		<constructor-arg type="java.lang.String" value="#{config.igcFolder}" /> 
-	</bean>
+    <bean id="config" class="org.ogn.gateway.Configuration"/>
 
     <!--  mbean exported used for exporting POJOs as JMX beans (e.g. some beans from commons) -->
 	<bean class="org.springframework.jmx.export.MBeanExporter"
 		lazy-init="false">
 		<property name="beans">
 			<map>
-				<entry key="org.ogn.commons.igc:name=IgcLogger" value-ref="igcLogger" />
+ 				<entry key="org.ogn.commons.igc:name=IgcLogger" value-ref="igcLogger" />
 			</map>
 		</property>
+	</bean>
+
+ 	<!-- IGC logger works by default in a non-blocking (async) mode --> 
+	<bean id="igcLogger" class="org.ogn.commons.igc.IgcLogger">
+		<constructor-arg type="java.lang.String" value="#{config.igcFolder}" /> 
 	</bean>
 
 	<beans profile="PRO">
