@@ -5,8 +5,9 @@
 package org.ogn.gateway;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import javax.annotation.Resource;
 
@@ -34,10 +35,10 @@ public class ConfigurationTest {
 		assertNotNull(config);
 		assertEquals("plugins", config.getPluginsFolderName());
 		assertEquals(30000, config.getScanningInterval());
+		assertTrue(config.isIgcEnabled());
 		assertEquals("log/testigc", config.getIgcFolder());
 		assertEquals(6, config.getMaxPacketErrors());
 		assertEquals(true, config.isSimulationModeOn());
-		assertFalse(config.isClusteringEnabled());
-
+		assertNull(config.getAprsFilter());
 	}
 }
