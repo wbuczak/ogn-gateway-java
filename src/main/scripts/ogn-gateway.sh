@@ -8,7 +8,7 @@
 TIME=`date +"%F %T.%3N"`
 
 # check if OGN_HOME is set in the system
-if [ ! -z ${OGN_HOME} ]; then
+if [[ ! -z ${OGN_HOME} ]]; then
   OGN_GATEWAY_HOME=${OGN_HOME}/ogn-gateway
 else
   # set the default ong-gateway's home path
@@ -19,7 +19,7 @@ PROCESS_NAME=ogn-gateway
 
 OGN_GATEWAY_CON_DIR=${OGN_GATEWAY_HOME}/conf
 
-if [ -z ${OGN_GATEWAY_LOG_DIR} ]; then
+if [[ -z ${OGN_GATEWAY_LOG_DIR} ]]; then
   OGN_GATEWAY_LOG_DIR=${OGN_GATEWAY_HOME}/log
 fi
 
@@ -57,7 +57,7 @@ JCONSOLE_REMOTE="-Dcom.sun.management.jmxremote.port=${OGN_GATEWAY_JMX_PORT} \
 # uncomment and update accordingly if you need to tune ogn-client connection
 #APRS_OPTS="-Dogn.server.name=52.16.247.84"
 
-if [ ! -d ${OGN_GATEWAY_TMP_DIR} ] ; then
+if [[ ! -d ${OGN_GATEWAY_TMP_DIR} ]]; then
   mkdir ${OGN_GATEWAY_TMP_DIR}
 fi
 
@@ -66,14 +66,18 @@ PROCESS_COMMAND=$1
 PID_FILE=${OGN_GATEWAY_TMP_DIR}/ogn-gateway.pid
 
 # Make sure the JAVA_BIN variable points to the java bin directory on your machine
-if [ ! -z ${JAVA_HOME} ]; then
+if [[ ! -z ${JAVA_HOME} ]]; then
   JAVA_BIN=${JAVA_HOME}/bin/java
 else
   JAVA_BIN=/usr/bin/java
 fi
 
 #JVM_OPTS="-Xms256m -Xmx256m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100"
-JVM_OPTS="-Xms256m -Xmx256m"
+
+if [[ -z ${JVM_OPTS} ]]; then
+  # use defaults
+  JVM_OPTS="-Xms128m -Xmx256m"
+fi
 
 RETVAL=0
 
