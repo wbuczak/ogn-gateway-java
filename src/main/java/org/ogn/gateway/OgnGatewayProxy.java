@@ -45,8 +45,8 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 	@Autowired
 	Configuration			conf;
 
-	static final Logger		LOG_FORWARDED	= LoggerFactory.getLogger("OgnGatewayProxyForwardedLog");
-	static final Logger		LOG_DISCARDED	= LoggerFactory.getLogger("OgnGatewayProxyDiscardedLog");
+	static final Logger		LOG_FORWARDED	= LoggerFactory.getLogger("OgnGatewayForwardedBeaconsLog");
+	static final Logger		LOG_DISCARDED	= LoggerFactory.getLogger("OgnGatewayDiscardedBeaconsLog");
 
 	static final Logger		LOG_AIR_RAW		= LoggerFactory.getLogger("RawAircraftBeaconsLog");
 	static final Logger		LOG_AIR_DECODED	= LoggerFactory.getLogger("DecodedAircraftBeaconsLog");
@@ -81,7 +81,8 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 				LOG_AIR_DECODED.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
 		}
 
-		if (conf.isIgcEnabled()) {
+		// only log if IGC logging enabled and the user allows tracking
+		if (conf.isIgcEnabled() && descriptor.isPresent() && descriptor.get().isTracked()) {
 			// log to IGC file (non blocking operation)
 			igcLogger.log(beacon, descriptor);
 		}
