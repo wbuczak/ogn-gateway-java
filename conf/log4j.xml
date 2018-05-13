@@ -43,6 +43,7 @@
 
 	<appender name="OgnGatewayDiscardedBeaconsAppender" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="File" value="${process.log.path}/discarded.log" />
+		<param name="MaxBackupIndex" value="2" />
 		<param name="DatePattern" value="'.'yyyy-MM-dd" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
@@ -51,6 +52,7 @@
 
 	<appender name="AprsUnmachedBeaconsFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="File" value="${process.log.path}/aprs/unmached.log" />
+		<param name="MaxBackupIndex" value="2" />
 		<param name="DatePattern" value="'.'yyyy-MM-dd" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %c{1} - %m%n" />
@@ -70,6 +72,7 @@
 
 	<appender name="RawAprsAircraftBeaconsFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="File" value="${process.log.path}/aprs/aircraft-raw.log" />
+		<param name="MaxBackupIndex" value="2" />		
 		<param name="DatePattern" value="'.'yyyy-MM-dd" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
@@ -78,6 +81,7 @@
 
 	<appender name="DecodedAprsAircraftBeaconsFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="File" value="${process.log.path}/aprs/aircraft-decoded.log" />
+		<param name="MaxBackupIndex" value="1" />		
 		<param name="DatePattern" value="'.'yyyy-MM-dd" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
@@ -86,6 +90,7 @@
 
 	<appender name="RawAprsReceiverBeaconsFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="File" value="${process.log.path}/aprs/receivers-raw.log" />
+		<param name="MaxBackupIndex" value="2" />		
 		<param name="DatePattern" value="'.'yyyy-MM-dd" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
@@ -94,6 +99,7 @@
 
 	<appender name="DecodedAprsReceiverBeaconsFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="File" value="${process.log.path}/aprs/receivers-decoded.log" />
+		<param name="MaxBackupIndex" value="1" />		
 		<param name="DatePattern" value="'.'yyyy-MM-dd" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
