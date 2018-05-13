@@ -132,12 +132,12 @@
 	</logger>
 
 	<logger name="OgnGatewayForwardedBeaconsLog" additivity="false">
-		<level value="info" />
+		<level value="off" />
 		<appender-ref ref="OgnGatewayForwardedBeaconsAppender" />
 	</logger>
 
 	<logger name="OgnGatewayDiscardedBeaconsLog" additivity="false">
-		<level value="info" />
+		<level value="off" />
 		<appender-ref ref="OgnGatewayDiscardedBeaconsAppender" />
 	</logger>
 
@@ -155,7 +155,7 @@
 
 	<!-- log all decoded aircraft beacons -->
 	<logger name="DecodedAircraftBeaconsLog" additivity="false">
-		<level value="info" />
+		<level value="off" />
 		<appender-ref ref="DecodedAprsAircraftBeaconsFileAppender" />
 	</logger>
 
@@ -167,7 +167,7 @@
 
 	<!-- log all decoded receiver beacons -->
 	<logger name="DecodedReceiverBeaconsLog" additivity="false">
-		<level value="info" />
+		<level value="off" />
 		<appender-ref ref="DecodedAprsReceiverBeaconsFileAppender" />
 	</logger>
 
