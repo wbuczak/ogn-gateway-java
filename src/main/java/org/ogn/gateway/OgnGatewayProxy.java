@@ -81,8 +81,9 @@ public class OgnGatewayProxy implements AircraftBeaconListener, ReceiverBeaconLi
 				LOG_AIR_DECODED.info("{} {}", beacon.getId(), JsonUtils.toJson(beacon));
 		}
 
-		// only log if IGC logging enabled and the user allows tracking
-		if (conf.isIgcEnabled() && descriptor.isPresent() && descriptor.get().isTracked()) {
+		// only log if IGC logging enabled and the user allows tracking + identification
+		if (conf.isIgcEnabled() && descriptor.isPresent() && descriptor.get().isTracked()
+				&& descriptor.get().isIdentified()) {
 			// log to IGC file (non blocking operation)
 			igcLogger.log(beacon, descriptor);
 		}
