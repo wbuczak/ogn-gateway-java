@@ -41,11 +41,6 @@
 					<bean class="org.ogn.commons.db.FileDbDescriptorProvider"
 						c:clazz="org.ogn.commons.db.ogn.OgnDb" c:dbRefreshInterval="${ogn.gateway.ogn_db_refresh_interval:900}" />
 
-					<!-- FlarmNet aircraft file db. descriptor provider -->
-					<!-- OGN no longer uses FlarmNet! -->
-					<!-- <bean class="org.ogn.commons.db.FileDbDescriptorProvider" c:clazz="org.ogn.commons.db.flarmnet.FlarmNetDb" 
-						/> -->
-
 				</list>
 			</constructor-arg>
 		</bean>
