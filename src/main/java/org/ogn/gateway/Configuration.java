@@ -29,9 +29,6 @@ public class Configuration {
 	@Value("${ogn.gateway.simulation:#{systemProperties['OGN_GATEWAY_SIMULATION'] ?: false}}")
 	private boolean	simulationMode;
 
-	@Value("${ogn.gateway.aprs.filter:#{systemProperties['OGN_GATWAY_APRS_FILTER']}}")
-	private String	aprsFilter;
-
 	@ManagedAttribute
 	public String getPluginsFolderName() {
 		return pluginsFolder;
@@ -55,11 +52,6 @@ public class Configuration {
 	@ManagedAttribute
 	public boolean isIgcEnabled() {
 		return igcEnabled;
-	}
-
-	@ManagedAttribute
-	public String getAprsFilter() {
-		return aprsFilter;
 	}
 
 	@ManagedAttribute
