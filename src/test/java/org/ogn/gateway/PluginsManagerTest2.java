@@ -23,8 +23,8 @@ public class PluginsManagerTest2 {
 
 	@Before
 	public void before() throws Exception {
-		Path dir = Paths.get("src/test/resources/plugins2");
-		Path file = Paths.get("src/test/resources/plugins2/ogn-gateway-duplicates-1.0.0.jar");
+		final Path dir = Paths.get("src/test/resources/plugins2");
+		final Path file = Paths.get("src/test/resources/plugins2/ogn-gateway-duplicates-1.0.0.jar");
 
 		if (Files.exists(dir)) {
 
@@ -52,7 +52,7 @@ public class PluginsManagerTest2 {
 
 		replay(conf);
 
-		PluginsManager pluginsManager = new PluginsManager(conf);
+		final PluginsManager pluginsManager = new PluginsManager(conf);
 
 		// no plugins expected at first
 		assertEquals(0, pluginsManager.getRegisteredAircraftPluginsCount());
@@ -65,6 +65,7 @@ public class PluginsManagerTest2 {
 		//
 		// Files.copy(source, destination);
 
+		// TODO: replace with Awaitility.await;
 		while (pluginsManager.getRegisteredAircraftPluginsCount() < 1) {
 			Thread.sleep(50);
 		}
