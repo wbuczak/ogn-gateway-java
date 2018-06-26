@@ -7,23 +7,24 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:mbean-export registration="ignoreExisting" /> 
-    
-    <bean id="config" class="org.ogn.gateway.Configuration"/>
+	<context:mbean-export registration="ignoreExisting" />
 
-    <!--  mbean exported used for exporting POJOs as JMX beans (e.g. some beans from commons) -->
+	<bean id="config" class="org.ogn.gateway.Configuration" />
+
+	<!-- mbean exported used for exporting POJOs as JMX beans (e.g. some beans 
+		from commons) -->
 	<bean class="org.springframework.jmx.export.MBeanExporter"
 		lazy-init="false">
 		<property name="beans">
 			<map>
- 				<entry key="org.ogn.commons.igc:name=IgcLogger" value-ref="igcLogger" />
+				<entry key="org.ogn.commons.igc:name=IgcLogger" value-ref="igcLogger" />
 			</map>
 		</property>
 	</bean>
 
- 	<!-- IGC logger works by default in a non-blocking (async) mode --> 
+	<!-- IGC logger works by default in a non-blocking (async) mode -->
 	<bean id="igcLogger" class="org.ogn.commons.igc.IgcLogger">
-		<constructor-arg type="java.lang.String" value="#{config.igcFolder}" /> 
+		<constructor-arg type="java.lang.String" value="#{config.igcFolder}" />
 	</bean>
 
 	<beans profile="PRO">
@@ -39,18 +40,20 @@
 					<!-- OGN aircraft file db. descriptor provider, default refresh rate: 
 						15 min (900sec) -->
 					<bean class="org.ogn.commons.db.FileDbDescriptorProvider"
-						c:clazz="org.ogn.commons.db.ogn.OgnDb" c:dbRefreshInterval="${ogn.gateway.ogn_db_refresh_interval:900}" />
+						c:clazz="org.ogn.commons.db.ogn.OgnDb"
+						c:dbFileUri="${ogn.gateway.ogn_db_url:#{systemEnvironment['OGN_GATEWAY_DDB_URL'] ?: null}}"
+						c:dbRefreshInterval="${ogn.gateway.ogn_db_refresh_interval:#{systemEnvironment['OGN_GATEWAY_DDB_REFRESH_INTERVAL'] ?: 900}}" />
 
 				</list>
 			</constructor-arg>
 		</bean>
 
-        <!--  scan for beans, but skip the plugins -->
+		<!-- scan for beans, but skip the plugins -->
 		<context:component-scan base-package="org.ogn.gateway">
 			<context:exclude-filter type="regex"
 				expression="org.ogn.gateway.plugin.*" />
 		</context:component-scan>
-		
+
 
 	</beans>
 
