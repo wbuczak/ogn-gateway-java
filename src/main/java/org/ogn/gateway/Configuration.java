@@ -11,13 +11,13 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 @ManagedResource(objectName = "org.ogn.gateway:name=Config", description = "OGN gateway's configuration holder")
 public class Configuration {
 
-	@Value("${ogn.gateway.plugins.folder:#{systemProperties['OGN_GATEWAY_PLUGINS_FOLDER'] ?: 'plugins'}}")
+	@Value("${ogn.gateway.plugins.folder:#{systemEnvironment['OGN_GATEWAY_PLUGINS_FOLDER'] ?: 'plugins'}}")
 	private String	pluginsFolder;
 
-	@Value("${ogn.gateway.igc.folder:#{systemProperties['OGN_GATEWAY_IGC_FOLDER'] ?: 'log/igc'}}")
+	@Value("${ogn.gateway.igc.folder:#{systemEnvironment['OGN_GATEWAY_IGC_FOLDER'] ?: 'log/igc'}}")
 	private String	igcFolder;
 
-	@Value("${ogn.gateway.igc.enabled:#{systemProperties['OGN_GATEWAY_IGC_ENABLED'] ?: true}}")
+	@Value("${ogn.gateway.igc.enabled:#{systemEnvironment['OGN_GATEWAY_IGC_ENABLED'] ?: true}}")
 	private boolean	igcEnabled;
 
 	@Value("${ogn.gateway.plugins.scanning_interval:30000}")
@@ -26,7 +26,7 @@ public class Configuration {
 	@Value("${ogn.gateway.max_packet_errors:5}")
 	private int		maxPacketErrors;
 
-	@Value("${ogn.gateway.simulation:#{systemProperties['OGN_GATEWAY_SIMULATION'] ?: false}}")
+	@Value("${ogn.gateway.simulation:#{systemEnvironment['OGN_GATEWAY_SIMULATION'] ?: false}}")
 	private boolean	simulationMode;
 
 	@ManagedAttribute
